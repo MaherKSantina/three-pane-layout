@@ -3,6 +3,7 @@ import IconMenu from './IconMenu';
 import Avatar from '@mui/material/Avatar';
 
 const meta = {
+  title: "Figma/IconMenu",
   component: IconMenu,
 };
 

@@ -1,9 +1,19 @@
 import { Button } from '@mui/material';
 import { FigmaSection } from './FigmaSection';
-import { XCodeLayout } from './XCodeLayout';
 
 const meta = {
-  component: FigmaSection,
+  title: "Figma/Section",
+  component: ({title, style}) => (<FigmaSection title={title} details={style}></FigmaSection>),
+  argTypes: {
+    style: {
+      options: ['pages', 'layers'],
+      control: { type: 'select' },
+      mapping: {
+        pages: <b>Bold</b>,
+        layers: <i>Italic</i>,
+      },
+    }
+  }
 };
 
 export default meta;
@@ -11,7 +21,6 @@ export default meta;
 export const Default = {
   args: {
     title: "Title",
-    action: (<Button>Action</Button>),
-    details: (<XCodeLayout></XCodeLayout>)
+    style: "pages"
   }
 };

@@ -1,6 +1,7 @@
 import { ThreePaneLayout } from './ThreePaneLayout';
 
 const meta = {
+  title: "Generic/ThreePaneLayout",
   component: ThreePaneLayout,
 };
 

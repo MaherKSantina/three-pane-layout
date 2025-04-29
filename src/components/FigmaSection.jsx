@@ -1,19 +1,14 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { FigmaTitleWithAccessory } from './FigmaTitleWithAccessory';
+import { ZoomIn } from '@mui/icons-material';
 
-export function FigmaSection({title, action, details}) {
+export function FigmaSection({title, action, children}) {
   return (
     <Grid container alignItems="center" direction={"column"} spacing={2}>
-        <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}>
-            <Grid>{title}</Grid>
-
-            <Grid sx={{ flexGrow: 1 }} /> {/* Spacer */}
-
-            <Grid>{action}</Grid>
-        </Grid>
-        {/* <Grid container alignItems="center" spacing={2} sx={{ width: '100%' }}> */}
-        {details}
+        <FigmaTitleWithAccessory title={title} action={action}></FigmaTitleWithAccessory>
+        {children}
         {/* </Grid> */}
     </Grid>
   );
