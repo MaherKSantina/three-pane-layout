@@ -1,7 +1,7 @@
 {
   "name": "three-pane-layout",
   "version": "0.1.0",
-  "homepage" : "https://maherksantina.github.io/three-pane-layout",
+  "homepage": "https://maherksantina.github.io/three-pane-layout",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",
