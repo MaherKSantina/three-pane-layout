@@ -93,27 +93,29 @@ export const usePagesStore = create((set, get) => ({
     }
   },
   syncCodeToServer: async (key, code) => {
-    const pages = get().pages
-    let selectedPage = Object.values(pages).find(c => c.selected)
+    const pages = get().pages;
+    let selectedPage = Object.values(pages).find(c => c.selected);
+  
     try {
       const response = await fetch(`${env.httpHost}/page/${key}/code`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          code,
-        }),
+        body: JSON.stringify({ code }),
       });
   
       if (!response.ok) {
-        throw new Error(`Failed to sync code: ${response.statusText}`);
+        const errBody = await response.json();
+        throw new Error(errBody.message || 'Unknown error saving code');
       }
   
       console.log(`Successfully synced code for page: ${key}`);
-      await get().fetchPages(selectedPage)
+      await get().fetchPages(selectedPage);
+      return null; // No error
     } catch (error) {
       console.error('Error syncing code to server:', error);
+      return error.message;
     }
-  },
+  }  
 }));

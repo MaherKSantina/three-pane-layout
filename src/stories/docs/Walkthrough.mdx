@@ -56,10 +56,8 @@ At this stage there is no ability to add/edit/delete pages.
 
 # ❗ Troubleshooting
 
-- There is currently **no UI feedback** to indicate when a page has been saved. Check browser developer console logs to confirm success. Also, ensure the YAML is valid to prevent update failures.
-
-- Everything is deployed using docker containers on [fly.io](https://fly.io/). There might be some cold starts for some services. So if you notice that something is not responsive please wait a few minutes and try again.
-
-## YAML Error Example
+- There is currently **no UI feedback** to indicate if a page layout yaml has been successfully saved. Check browser developer console logs to confirm success. If the yaml is invalid, you will see a dialog open with the location of the error like the one below.
 
 ![Error Example](./ManagingContent-errorExample.png)
+
+- Everything is deployed using docker containers on [fly.io](https://fly.io/). There might be some cold starts for some services. So if you notice that something is not responsive please wait a few minutes and try again.
