@@ -1,0 +1,65 @@
+import { Meta } from "@storybook/blocks";
+import { Alert } from "@mui/material";
+
+<Meta title="Walkthrough" />
+
+# 📘 Introduction
+This storybook demonstrates a complete platform solution and how strong documentation can enhance Developer Experience (DX) and maintain high code quality.
+
+The solution consists of three key components:
+
+## 📱 React Native App
+- Displays pages configured via CMS.
+- Communicates with the API through WebSockets for real-time layout updates.
+
+## 🖥️ React CMS
+- Provides a GUI to edit and push layout updates to the app using YAML configuration.
+
+## 🔌 API
+- Node.js (Express) backend using PostgreSQL.
+- Integrates with [n8n](https://n8n.io/) for automation workflows.
+
+You can browse the different pages on the left to inspect different components and their states 
+
+
+# ⚙️ Installation
+
+<Alert severity="info">
+The React Native app is not deployed yet. To run it locally, follow the steps below.
+</Alert>
+
+1. Clone the repo: [ComponentPlayground](https://github.com/MaherKSantina/ComponentPlayground)
+2. Start the app:
+
+```bash
+npx expo start --tunnel
+```
+
+3. Follow Expo instructions to run the app on Web, iOS, or Android.
+
+# 🧑‍💻 Managing Content via CMS
+- Open the live CMS: [three-pane-layout.fly.dev](https://three-pane-layout.fly.dev/)
+- Select the page you want to update on the left
+- Update the page's layout structure in the monaco editor
+
+![Managing Content Layout](./ManagingContent-layout.png)
+
+<Alert severity="info">
+At this stage there is no ability to add/edit/delete pages.
+</Alert>
+
+# 🧪 (Optional) Run React CMS Locally
+1. Clone the repo: [three-pane-layout](https://github.com/MaherKSantina/three-pane-layout)
+2. Follow the repo's instructions to run the server locally.
+3. Update environment variables in the React Native app to point to the local CMS server.
+4. Make layout updates and see them reflect in real time.
+
+# ❗ Troubleshooting
+
+- There is currently **no UI feedback** to indicate when a page has been saved. Check browser developer console logs to confirm success. Also, ensure the YAML is valid to prevent update failures.
+
+- Everything is deployed using docker containers on [fly.io](https://fly.io/). There might be some cold starts for some services. So if you notice that something is not responsive please wait a few minutes and try again.
+
+## YAML Error Example
+
+![Error Example](./ManagingContent-errorExample.png)

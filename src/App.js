@@ -13,8 +13,7 @@ function App() {
   return (
     <Router>
       <Routes>
-      <Route path="/ui-editor" element={<UIEditor></UIEditor>} />
-      <Route path="/iconMenu" element={<IconMenu></IconMenu>} />
+      <Route path="/" element={<UIEditor></UIEditor>} />
       </Routes>
       
     </Router>
