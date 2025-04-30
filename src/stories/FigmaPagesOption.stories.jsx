@@ -1,8 +1,9 @@
-import { FigmaPagesOption } from './FigmaPagesOption';
+import { FigmaPagesOption } from '../components/FigmaPagesOption';
 
 const meta = {
   title: "Figma/PagesOption",
   component: FigmaPagesOption,
+  tags: ['autodocs'],
 };
 
 export default meta;

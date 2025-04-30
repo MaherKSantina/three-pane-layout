@@ -1,4 +1,4 @@
-import { ThreePaneLayout } from './ThreePaneLayout';
+import { ThreePaneLayout } from '../components/ThreePaneLayout';
 
 const meta = {
   title: "Generic/ThreePaneLayout",

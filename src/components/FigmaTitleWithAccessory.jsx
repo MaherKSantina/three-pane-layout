@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import PropTypes from 'prop-types';
 
 export function FigmaTitleWithAccessory({title, action}) {
   return (
@@ -19,3 +20,10 @@ export function FigmaTitleWithAccessoryPreview({title}) {
     <FigmaTitleWithAccessory title={title} action={<Button>Test</Button>}></FigmaTitleWithAccessory>
   )
 }
+
+FigmaTitleWithAccessory.propTypes = {
+  /** The title of the tile */
+  title: PropTypes.string,
+  /** The accessory element */
+  action: PropTypes.node,
+};

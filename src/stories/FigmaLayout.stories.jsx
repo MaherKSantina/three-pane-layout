@@ -1,4 +1,4 @@
-import { FigmaLayout } from './FigmaLayout';
+import { FigmaLayout } from '../components/FigmaLayout';
 
 const meta = {
   title: "Full/Figma",

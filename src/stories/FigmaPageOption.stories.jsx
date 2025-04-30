@@ -1,14 +1,15 @@
 import { fn } from '@storybook/test';
-import { FigmaPageOption } from './FigmaPageOption';
+import { FigmaPageOption } from '../components/FigmaPageOption';
 
 const meta = {
   title: "Figma/PageOption",
   component: FigmaPageOption,
+  // tags: ['autodocs'],
 };
 
 export default meta;
 
-export const Default = {
+export const Normal = {
   argTypes: {
     title: {
       type: "string"
@@ -26,10 +27,5 @@ export const Selected = {
     isSelected: true,
     title: "Page 1",
     onClick: fn()
-  },
-  argTypes: {
-    title: {
-      type: "string"
-    }
   },
 };

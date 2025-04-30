@@ -1,5 +1,5 @@
 import { PersonAdd } from '@mui/icons-material';
-import IconMenu from './IconMenu';
+import IconMenu from '../components/IconMenu';
 import Avatar from '@mui/material/Avatar';
 
 const meta = {

@@ -1,9 +1,11 @@
 import { ReactFlowProvider } from "@xyflow/react";
-import FigmaFlowScreen from "./FigmaFlowScreen";
+import FigmaFlowScreen from "../components/FigmaFlowScreen";
+import PropTypes from "prop-types";
 
 const meta = {
   title: 'Figma/FlowScreen',
   component: FigmaFlowScreen,
+  // tags: ['autodocs'],
   decorators: [
     (Story) => (
       <ReactFlowProvider>
@@ -22,9 +24,7 @@ export default meta;
 
 export const Default = {
   args: {
-    data: {
-      label: 'Login View',
-      selected: false,
-    },
+    label: 'Login View',
+    selected: false,
   },
 };

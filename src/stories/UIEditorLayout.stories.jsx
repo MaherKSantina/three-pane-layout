@@ -1,4 +1,4 @@
-import { UIEditorLayout } from './UIEditorLayout';
+import { UIEditorLayout } from '../components/UIEditorLayout';
 
 const meta = {
   title: "Full/UIEditor",

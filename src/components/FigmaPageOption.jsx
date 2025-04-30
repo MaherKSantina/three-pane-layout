@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
+import PropTypes from 'prop-types';
 
 export function FigmaPageOption({ title, isSelected = false, onClick }) {
   return (
@@ -25,3 +26,12 @@ export function FigmaPageOption({ title, isSelected = false, onClick }) {
     </Box>
   );
 }
+
+FigmaPageOption.propTypes = {
+    /** Title of the page */
+    title: PropTypes.string,
+    /** Is this page selected? */
+    isSelected: PropTypes.bool,
+    /** On click handler */
+    onClick: PropTypes.func,
+  };

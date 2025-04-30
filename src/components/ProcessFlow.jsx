@@ -1,10 +1,10 @@
 import React from 'react';
 import { ReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css'
-import FigmaFlowScreen from './FigmaFlowScreen';
+import FigmaFlowScreenNode from './FigmaFlowNode';
 
 const nodeTypes = {
-  figmaNode: FigmaFlowScreen, 
+  figmaNode: FigmaFlowScreenNode, 
 };
 
 const nodes = [

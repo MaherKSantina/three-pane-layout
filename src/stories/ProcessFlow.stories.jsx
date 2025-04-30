@@ -1,4 +1,4 @@
-import ProcessFlow from './ProcessFlow';
+import ProcessFlow from '../components/ProcessFlow';
 
 const meta = {
   title: "Process/Flow",
