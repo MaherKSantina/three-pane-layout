@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { env } from '../constants/env';
 
 export const usePagesStore = create((set, get) => ({
   pages: {},
@@ -95,7 +96,7 @@ export const usePagesStore = create((set, get) => ({
     const pages = get().pages
     let selectedPage = Object.values(pages).find(c => c.selected)
     try {
-      const response = await fetch(`https://n8n-proud-leaf-4689.fly.dev/webhook/e755d2e9-7ab2-4158-8a74-830a97ca1238/page/${key}`, {
+      const response = await fetch(`${env.httpHost}/page/${key}/code`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

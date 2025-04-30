@@ -7,13 +7,13 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import IconMenu from './components/IconMenu';
 import ProcessFlow from './components/ProcessFlow';
-import { UIEditorLayout } from './components/UIEditorLayout';
+import { UIEditor } from './components/UIEditor';
 
 function App() {
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<UIEditorLayout></UIEditorLayout>} />
+      <Route path="/ui-editor" element={<UIEditor></UIEditor>} />
       <Route path="/iconMenu" element={<IconMenu></IconMenu>} />
       </Routes>
       

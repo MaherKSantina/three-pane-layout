@@ -8,7 +8,7 @@ import IconMenu from './IconMenu';
 import { FigmaSection } from './FigmaSection';
 import { FigmaPagesOption } from './FigmaPagesOption';
 
-export function FigmaLeftPane({pages, selected, onSelect}) {
+export function FigmaLeftPane({pages, selected, onChange}) {
   return (
     <Grid container alignItems="center" direction={"column"}>
         <Grid alignItems="center" sx={{width: "100%"}}>
@@ -17,7 +17,7 @@ export function FigmaLeftPane({pages, selected, onSelect}) {
         </Grid>
         <Grid alignItems="center" sx={{width: "100%"}}>
             <FigmaSection title={"Pages"} action={<Search></Search>}>
-            <FigmaPagesOption pages={pages} selected={selected} onSelect={onSelect}></FigmaPagesOption>
+            <FigmaPagesOption pages={pages} selected={selected} onSelect={onChange}></FigmaPagesOption>
             </FigmaSection>
             </Grid>
     </Grid>

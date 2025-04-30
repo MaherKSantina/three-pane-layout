@@ -11,7 +11,7 @@ export function FigmaLayout({height = "100%", navigatorWidth = "15%"}) {
     <ThreePaneLayout
     height={height}
     leftWidth={navigatorWidth}
-  left={<FigmaLeftPane></FigmaLeftPane>}
+  left={<FigmaLeftPane pages={["Page 1", "Page 2", "Page 3"]} selected={"Page 2"}></FigmaLeftPane>}
   middle={<ProcessFlow></ProcessFlow>}
   right={<Box p={2}>Right Inspector Content</Box>}
 />
