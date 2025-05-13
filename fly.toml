@@ -1,4 +1,4 @@
-app = "three-pane-layout"
+app = "visualizer-react-2"
 primary_region = "syd"
 
 [build]
