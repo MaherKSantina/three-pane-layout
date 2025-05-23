@@ -4,6 +4,7 @@ import { useLocalChatListStore } from '../stores/chatList.local';
 import ChatList from './ChatList';
 
 const meta = {
+  title: "Visualization/Chat/List",
   component: ChatList,
 };
 

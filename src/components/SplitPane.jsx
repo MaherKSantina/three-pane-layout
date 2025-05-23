@@ -1,16 +1,16 @@
-// SplitPane.jsx
 import React, { useState } from 'react';
-import { Box, Slider } from '@mui/material';
+import { Slider } from '@mui/material';
 
 /**
  * SplitPane
- * 
+ *
  * Props:
  *  - left:    React node for left pane
  *  - right:   React node for right pane
  *  - initialSplit: number (0–100) initial % width of left pane
+ *  - height:  CSS height for container (defaults to 100vh)
  */
-export default function SplitPane({ left, right, initialSplit = 50, height }) {
+export default function SplitPane({ left, right, initialSplit = 50, height = '100vh' }) {
   const [split, setSplit] = useState(initialSplit);
 
   const handleSliderChange = (e, newValue) => {
@@ -18,41 +18,44 @@ export default function SplitPane({ left, right, initialSplit = 50, height }) {
   };
 
   return (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: height ?? '100vh', 
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height,
         width: '100%',
         overflow: 'hidden',
       }}
     >
-      {/* Panes */}
-      <Box sx={{ display: 'flex', flexGrow: 1, width: '100%' }}>
-        <Box 
-          sx={{ 
-            width: `${split}%`, 
+      {/* Panes container */}
+      <div
+        style={{
+          display: 'flex',
+          flexGrow: 1,
+          width: '100%',
+        }}
+      >
+        <div
+          style={{
+            width: `${split}%`,
             overflow: 'auto',
-            borderRight: 1, 
-            borderColor: 'divider',
-            p: 2,
+            borderRight: '1px solid #ccc',
           }}
         >
           {left}
-        </Box>
-        <Box 
-          sx={{ 
-            width: `${100 - split}%`, 
+        </div>
+        <div
+          style={{
+            width: `${100 - split}%`,
             overflow: 'auto',
-            p: 2,
           }}
         >
           {right}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* Slider */}
-      <Box sx={{ px: 2, py: 1 }}>
+      <div style={{ padding: '0 8px' }}>
         <Slider
           value={split}
           onChange={handleSliderChange}
@@ -61,7 +64,7 @@ export default function SplitPane({ left, right, initialSplit = 50, height }) {
           max={100}
           valueLabelDisplay="auto"
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

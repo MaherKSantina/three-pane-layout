@@ -1,18 +1,10 @@
-// ChatWindow.jsx
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Paper,
-  Stack,
-  TextField,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Paper, TextField, IconButton, Typography } from "@mui/material";
 import SendRounded from "@mui/icons-material/SendRounded";
-import { useStore } from "../contexts/StoreContext";
+import { useChatStore } from "../contexts/StoreContext";
 
-export default function ChatWindow({ chatId }) {
-  const { messages, fetchMessages, sendMessage } = useStore();
+function ChatContent({ chatId, height, width }) {
+  const { messages, fetchMessages, sendMessage } = useChatStore();
   const [input, setInput] = useState("");
   const listRef = useRef(null);
 
@@ -20,7 +12,6 @@ export default function ChatWindow({ chatId }) {
     fetchMessages(chatId);
   }, [chatId]);
 
-  // scroll on messages change
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [messages]);
@@ -46,65 +37,69 @@ export default function ChatWindow({ chatId }) {
   };
 
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         display: "flex",
         flexDirection: "column",
-        height: "100%",
+        height,
+        width,
         overflow: "hidden",
+        backgroundColor: "#f5f5f5",
       }}
     >
-      {/* messages list */}
-      <Stack
+      {/* Message List */}
+      <div
         ref={listRef}
-        sx={{ flexGrow: 1, p: 2, overflowY: "auto" }}
-        spacing={1}
+        style={{
+          flexGrow: 1,
+          overflowY: "auto",
+          padding: "16px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "8px",
+        }}
       >
         {messages.map((m) => (
-          <Box
+          <div
             key={m.id}
-            sx={{
+            style={{
               alignSelf: m.sender === "You" ? "flex-end" : "flex-start",
-              maxWidth: { xs: "80%", sm: "70%", md: "60%" },
+              maxWidth: "60%",
             }}
           >
             <Paper
               elevation={3}
-              sx={{
-                px: 2,
-                py: 1,
-                borderRadius: 2,
-                bgcolor: m.sender === "You" ? "primary.main" : "grey.300",
-                color:
-                  m.sender === "You" ? "primary.contrastText" : "text.primary",
+              style={{
+                padding: "8px 16px",
+                borderRadius: "12px",
+                backgroundColor: m.sender === "You" ? "#1976d2" : "#e0e0e0",
+                color: m.sender === "You" ? "#fff" : "#000",
                 wordBreak: "break-word",
               }}
             >
               <Typography variant="body2">{m.text}</Typography>
               <Typography
                 variant="caption"
-                sx={{ display: "block", textAlign: "right", mt: 0.5 }}
+                style={{ display: "block", textAlign: "right", marginTop: 4 }}
               >
                 {new Date(m.timestamp).toLocaleString()}
               </Typography>
             </Paper>
-          </Box>
+          </div>
         ))}
-      </Stack>
+      </div>
 
-      {/* input */}
-      <Box
-        component="form"
+      {/* Input Form */}
+      <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSend();
         }}
-        sx={{
+        style={{
           display: "flex",
-          gap: 1,
-          p: 2,
-          borderTop: 1,
-          borderColor: "divider",
+          gap: "8px",
+          padding: "16px",
+          borderTop: "1px solid #ddd",
           flexShrink: 0,
         }}
       >
@@ -118,10 +113,29 @@ export default function ChatWindow({ chatId }) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKey}
         />
-        <IconButton color="primary" type="submit" sx={{ alignSelf: "flex-end" }}>
+        <IconButton color="primary" type="submit" style={{ alignSelf: "flex-end" }}>
           <SendRounded />
         </IconButton>
-      </Box>
-    </Box>
+      </form>
+    </div>
   );
+}
+
+// Full screen version
+function FullViewChatWindow({ chatId }) {
+  return <ChatContent chatId={chatId} width="100vw" height="100vh" />;
+}
+
+// Fixed-size version
+function FixedParentChatWindow({ chatId, width = "100%", height = "100%" }) {
+  return <ChatContent chatId={chatId} width={width} height={height} />;
+}
+
+// Main wrapper
+export default function ChatWindow({ chatId, mode = "full", height, width }) {
+  if (mode === "full") {
+    return <FullViewChatWindow chatId={chatId} />;
+  } else {
+    return <FixedParentChatWindow chatId={chatId} height={height} width={width} />;
+  }
 }
