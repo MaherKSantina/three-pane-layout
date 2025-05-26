@@ -1,4 +1,4 @@
-import { StoreContext } from '../contexts/StoreContext';
+import { GanttContext, StoreContext } from '../contexts/StoreContext';
 import { useApiGanttStore } from '../stores/gantt.api';
 import { useGanttLocalStore } from '../stores/gantt.local';
 import GanttChart from './GanttChart';
@@ -13,9 +13,9 @@ export default meta;
 export const Default = {
   render() {
     return (
-      <StoreContext.Provider value={useGanttLocalStore()}>
-      <GanttChart />
-    </StoreContext.Provider>
+      <GanttContext.Provider value={useGanttLocalStore()}>
+      <GanttChart height={"100vh"} />
+    </GanttContext.Provider>
     )
   }
 };
@@ -23,9 +23,9 @@ export const Default = {
 export const API = {
   render() {
     return (
-      <StoreContext.Provider value={useApiGanttStore()}>
-      <GanttChart />
-    </StoreContext.Provider>
+      <GanttContext.Provider value={useApiGanttStore()}>
+      <GanttChart height={"100vh"} />
+    </GanttContext.Provider>
     )
   }
 };

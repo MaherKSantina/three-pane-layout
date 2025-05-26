@@ -1,28 +1,18 @@
-import { Box } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 /** @type { import('@storybook/react').Preview } */
 const preview = {
   parameters: {
     controls: { /* … */ },
   },
-  // decorators: [
-  //   (Story) => (
-  //     <Box
-  //       component="div"
-  //       sx={{
-  //         display: 'flex',       // ← make this a flex container
-  //         flexDirection: 'column',// ← stack children top-to-bottom
-  //         width: '100%',
-  //         height: '100%',
-  //         margin: 0,
-  //         flexGrow: 1,
-  //         minHeight: 0,
-  //       }}
-  //     >
-  //       <Story />
-  //     </Box>
-  //   ),
-  // ],
+  decorators: [
+    (Story) => (
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Story />
+      </LocalizationProvider>
+    ),
+  ],
 };
 
 export default preview;

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export const useGanttLocalStore = create(
+export const useGanttLocalStore = (localStorageName) => create(
   persist(
     (set, get) => ({
       tasks: [],
@@ -35,7 +35,7 @@ export const useGanttLocalStore = create(
         })),
     }),
     {
-      name: "gantt-storage",
+      name: localStorageName,
       partialize: (state) => ({ tasks: state.tasks, links: state.links }),
     }
   )

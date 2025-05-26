@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import gantt from "dhtmlx-gantt";
 import "dhtmlx-gantt/codebase/dhtmlxgantt.css";
-import { useStore } from "../contexts/StoreContext";
+import { GanttContext, useGanttStore } from "../contexts/StoreContext";
 
 const normalizeGanttData = (data = []) =>
   data.map((task) => ({
@@ -11,21 +11,23 @@ const normalizeGanttData = (data = []) =>
     open: true
   }));
 
-const GanttChart = () => {
+const GanttChart = ({height}) => {
   const ganttRef = useRef();
   const [gridVisible, setGridVisible] = useState(true);
   const [zoomLevel, setZoomLevel] = useState("day");
+  const ctx = useContext(GanttContext)
+
+  const tasks = ctx((state) => state.tasks);
+  const links = ctx((state) => state.links);
 
   const {
-    tasks,
-    links,
     fetchData,
     addTask,
     updateTask,
     deleteTask,
     addLink,
     deleteLink,
-  } = useStore();
+  } = ctx.getState();
 
   // 🧠 Attach handlers only once
   useEffect(() => {
@@ -123,7 +125,7 @@ const GanttChart = () => {
           </select>
         </label>
       </div>
-      <div ref={ganttRef} style={{ height: "100vh", width: "100%" }} />
+      <div ref={ganttRef} style={{ height, width: "100%" }} />
     </div>
   );
 };

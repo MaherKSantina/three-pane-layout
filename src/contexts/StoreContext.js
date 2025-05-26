@@ -26,7 +26,7 @@ export const useKanbanStore = () => {
 
 export const GanttContext = createContext(null)
 export const useGanttStore = () => {
-  const store = useContext(KanbanContext);
+  const store = useContext(GanttContext);
   if (!store) throw new Error("Store not provided");
   return store;
 };
@@ -48,6 +48,13 @@ export const useCalendarStore = () => {
 export const ProcessContext = createContext(null)
 export const useProcessStore = () => {
   const store = useContext(ProcessContext);
+  if (!store) throw new Error("Store not provided");
+  return store;
+};
+
+export const CraftContext = createContext(null)
+export const useCraftStore = () => {
+  const store = useContext(CraftContext);
   if (!store) throw new Error("Store not provided");
   return store;
 };
