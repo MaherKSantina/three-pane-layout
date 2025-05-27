@@ -4,6 +4,9 @@ import { CraftContext, useCraftStore } from "../../contexts/StoreContext";
 import { CSCEDate } from "./CSCEDate";
 import { SettingsPanel } from "./SettingsPanel";
 import { DynamicTask } from "./DynamicTask";
+import { FixedTask } from "./FixedTask";
+import { Sequential } from "./Sequential";
+import { ParentTask } from "./ParentTask";
 
 // ---- Toolbox for adding components ----
 function Toolbox() {
@@ -15,9 +18,10 @@ function Toolbox() {
         }}>
             <span style={{ fontWeight: 600, marginBottom: 8 }}>Toolbox</span>
             {CSCEDate.toolbox(connectors)}
-            <div ref={ref => connectors.create(ref, <DynamicTask></DynamicTask>)}>
-                <button style={{ width: "100%" }}>Dynamic Task</button>
-            </div>
+            {DynamicTask.toolbox(connectors)}
+            {FixedTask.toolbox(connectors)}
+            {Sequential.toolbox(connectors)}
+            {ParentTask.toolbox(connectors)}
         </div>
     );
 }
@@ -68,7 +72,10 @@ export default function EditorPage({ width = "100%", height = "100%" }) {
                 options={{ enabled: true }}
                 resolver={{
                     CSCEDate,
-                    DynamicTask
+                    DynamicTask,
+                    FixedTask,
+                    Sequential,
+                    ParentTask
                 }}
                 onNodesChange={handleNodesChange}
             >

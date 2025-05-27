@@ -3,7 +3,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TextField, Stack } from "@mui/material";
 import dayjs from "dayjs";
 
-export function DynamicTask() {
+export function FixedTask() {
     const { connectors: { connect, drag }, id, name } = useNode((node) => ({
       name: node.data.props.name,
     }));
@@ -72,8 +72,10 @@ export function DynamicTask() {
     const {
     actions: { setProp },
     name,
+    duration
     } = useNode((node) => ({
       name: node.data.props.name,
+      duration: node.data.props.duration
     }));
 
     return (
@@ -89,12 +91,23 @@ export function DynamicTask() {
         }
         slotProps={{ textField: { fullWidth: true } }}
         />
+        <TextField
+        label="Duration"
+        value={duration}
+        onChange={(e) => {
+
+          setProp((props) => (props.duration = e.target.value))
+        }
+            
+        }
+        slotProps={{ textField: { fullWidth: true } }}
+        />
     </Stack>
     );
 }  
 
-  DynamicTask.craft = {
-    displayName: "DynamicTask",
+  FixedTask.craft = {
+    displayName: "FixedTask",
     props: {},
     canvas: true,
     related: {
@@ -102,10 +115,10 @@ export function DynamicTask() {
     }
   };
 
-  DynamicTask.toolbox = (connectors) => {
-      return (
-        <div ref={ref => connectors.create(ref, <DynamicTask></DynamicTask>)}>
-            <button style={{ width: "100%" }}>DynamicTask</button>
-        </div>
-      )
-    }
+  FixedTask.toolbox = (connectors) => {
+        return (
+          <div ref={ref => connectors.create(ref, <FixedTask></FixedTask>)}>
+              <button style={{ width: "100%" }}>FixedTask</button>
+          </div>
+        )
+      }

@@ -1,21 +1,21 @@
 import { Element, useEditor, useNode } from "@craftjs/core";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { TextField, Stack } from "@mui/material";
 import dayjs from "dayjs";
 
-export function DynamicTask() {
+export function ParentTask({ children }) {
     const { connectors: { connect, drag }, id, name } = useNode((node) => ({
-      name: node.data.props.name,
-    }));
+        name: node.data.props.name,
+      }));
     const { actions } = useEditor();
     return (
       <div
         ref={ref => connect(drag(ref))}
         style={{
-          minHeight: 30,
-          minWidth: 30,
+          minHeight: 120,
+          minWidth: 220,
           padding: 24,
-          border: "2px solid rgb(204, 231, 52)",
+          border: "2px solid #3485e7",
           borderRadius: 10,
           background: "#f3f8ff",
           margin: 12,
@@ -64,48 +64,65 @@ export function DynamicTask() {
         }}>
           {name}
         </div>
+        {/* Drop zone */}
+        <Element id="rect-drop-area" is="div" canvas style={{
+          width: "100%",
+          minHeight: 40,
+          border: !children ? "2px dashed #b5cffa" : "1px solid #c3d5f3",
+          background: "#fff",
+          borderRadius: 6,
+          padding: 14,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "border 0.18s",
+        }}>
+          {children}
+        </Element>
       </div>
     );
   }
 
-  function Settings() {
+function Settings() {
     const {
-    actions: { setProp },
-    name,
-    } = useNode((node) => ({
-      name: node.data.props.name,
-    }));
-
-    return (
-    <Stack spacing={2} sx={{ p: 2 }}>
-        <TextField
-        label="Name"
-        value={name}
-        onChange={(e) => {
-
-          setProp((props) => (props.name = e.target.value))
-        }
-            
-        }
-        slotProps={{ textField: { fullWidth: true } }}
-        />
-    </Stack>
+        actions: { setProp },
+        name,
+        duration
+        } = useNode((node) => ({
+          name: node.data.props.name,
+          duration: node.data.props.duration
+        }));
+    
+        return (
+        <Stack spacing={2} sx={{ p: 2 }}>
+            <TextField
+            label="Name"
+            value={name}
+            onChange={(e) => {
+    
+              setProp((props) => (props.name = e.target.value))
+            }
+                
+            }
+            slotProps={{ textField: { fullWidth: true } }}
+            />
+        </Stack>
     );
 }  
 
-  DynamicTask.craft = {
-    displayName: "DynamicTask",
+  ParentTask.craft = {
+    displayName: "ParentTask",
     props: {},
     canvas: true,
     related: {
-      settings: Settings
+        settings: Settings
     }
   };
 
-  DynamicTask.toolbox = (connectors) => {
-      return (
-        <div ref={ref => connectors.create(ref, <DynamicTask></DynamicTask>)}>
-            <button style={{ width: "100%" }}>DynamicTask</button>
-        </div>
-      )
-    }
+  ParentTask.toolbox = (connectors) => {
+    return (
+      <div ref={ref => connectors.create(ref, <ParentTask></ParentTask>)}>
+          <button style={{ width: "100%" }}>ParentTask</button>
+      </div>
+    )
+  }
