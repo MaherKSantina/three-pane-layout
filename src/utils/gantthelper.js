@@ -91,7 +91,8 @@ export function normalizeGanttData(data = []) {
     function getNodeDuration(nodeId, parentChain) {
       const node = nodes[nodeId];
       if (!node) return 0;
-      
+    
+      // 1. FixedTask: just its duration
       if (node.type && node.type.resolvedName === "FixedTask") {
         try {
           const duration = parseInt(node.props.duration ?? 0);
@@ -99,26 +100,46 @@ export function normalizeGanttData(data = []) {
         } catch {
           return 0;
         }
-      } else if (node.type && node.type.resolvedName === "Sequential") {
-        // For Sequence, sum up all children durations
-        const dropAreaId = node.linkedNodes && node.linkedNodes["rect-drop-area"];
-        if (dropAreaId && nodes[dropAreaId] && nodes[dropAreaId].nodes) {
-          let totalDuration = 0;
-          for (const childId of nodes[dropAreaId].nodes) {
-            totalDuration += getNodeDuration(childId, [...parentChain, { 
-              type: "Sequential", 
-              nodeId, 
-              dropAreaId 
-            }]);
-          }
-          return totalDuration;
-        }
       }
-      
+    
+      // 2. Sequential: sum of all child durations
+      if (node.type && node.type.resolvedName === "Sequential") {
+        const dropAreaId = node.linkedNodes && node.linkedNodes["rect-drop-area"];
+        if (dropAreaId && nodes[dropAreaId] && Array.isArray(nodes[dropAreaId].nodes)) {
+          let total = 0;
+          for (const childId of nodes[dropAreaId].nodes) {
+            total += getNodeDuration(childId, [
+              ...parentChain,
+              { type: "Sequential", nodeId, dropAreaId }
+            ]);
+          }
+          return total;
+        }
+        return 0;
+      }
+    
+      // 3. ParentTask: max duration among direct children
+      if (node.type && node.type.resolvedName === "ParentTask") {
+        const dropAreaId = node.linkedNodes && node.linkedNodes["rect-drop-area"];
+        if (dropAreaId && nodes[dropAreaId] && Array.isArray(nodes[dropAreaId].nodes)) {
+          let maxDur = 0;
+          for (const childId of nodes[dropAreaId].nodes) {
+            const dur = getNodeDuration(childId, [
+              ...parentChain,
+              { type: "ParentTask", nodeId, dropAreaId }
+            ]);
+            if (dur > maxDur) maxDur = dur;
+          }
+          return maxDur;
+        }
+        return 0;
+      }
+    
+      // 4. Fallback
       return 0;
-    }
+    }    
 
-    function applyTaskBusinessLogic(node, parentChain, nodeId) {
+    function applyTaskBusinessLogic(node, parentChain, nodeId, childrenInfo) {
       let update = {};
   
       if(["DynamicTask"].includes(node.type.resolvedName)) {
@@ -165,10 +186,70 @@ export function normalizeGanttData(data = []) {
           }
           update.end_date = startDate.plus({hours: duration}).toISO()
         }
+
+        const nearestParentTask = parentChain.slice().reverse().find(p => p.type === "ParentTask" && p.ganttId);
+        if (nearestParentTask) {
+          update.parent = nearestParentTask.ganttId;
+          update.$rendered_parent = nearestParentTask.ganttId;
+        }
+
         if(parentCSCEDate && update.end_date > parentCSCEDate.endDate) {
           update.color = "red"
         }
       }
+
+      if(["ParentTask"].includes(node.type.resolvedName)) {
+        const parentCSCEDate = parentChain.find(
+          (p) => p.type === "CSCEDate"
+        );
+        if (!parentCSCEDate) {
+          update.start_date = DateTime.now().toISO()
+          update.color = "red";
+        } else {
+          // Check if this task is inside a Sequence
+          const hasSequentialParent = parentChain.some(p => p.type === "Sequential");
+          let startDate;
+          
+          if (hasSequentialParent) {
+            // Calculate offset based on position in sequence(s)
+            const offsetHours = getOffset(nodeId, parentChain);
+            startDate = DateTime.fromISO(parentCSCEDate.startDate, { zone: "utc" }).plus({ hours: offsetHours });
+          } else {
+            startDate = DateTime.fromISO(parentCSCEDate.startDate, { zone: "utc" });
+          }
+          
+          update.start_date = startDate.toISO();
+          
+          let duration = 1
+          // try {
+          //   if(!isNaN(parseInt(node.props.duration ?? 0)))
+          //   duration = parseInt(node.props.duration ?? 0)
+          // } catch {
+  
+          // }
+          update.end_date = startDate.plus({hours: duration}).toISO()
+        }
+
+        const nearestParentTask = parentChain.slice().reverse().find(p => p.type === "ParentTask" && p.ganttId);
+        if (nearestParentTask) {
+          update.parent = nearestParentTask.ganttId;
+          update.$rendered_parent = nearestParentTask.ganttId;
+        }
+
+        if(parentCSCEDate && update.end_date > parentCSCEDate.endDate) {
+          update.color = "red"
+        }
+      }
+
+      // if(node.type.resolvedName === "ParentTask") {
+      //   // childrenInfo: [{task, node}, ...]
+      //   const startDates = childrenInfo.map(c => c.task?.start_date).filter(Boolean);
+      //   const endDates = childrenInfo.map(c => c.task?.end_date).filter(Boolean);
+      //   const minStart = startDates.length ? startDates.reduce((a, b) => a < b ? a : b) : null;
+      //   const maxEnd = endDates.length ? endDates.reduce((a, b) => a > b ? a : b) : null;
+      //   update.start_date = minStart
+      //   update.end_date = maxEnd
+      // }
   
       update.$no_start = !update.start_date
       update.$no_end = !update.end_date
@@ -258,6 +339,49 @@ export function normalizeGanttData(data = []) {
         })
         Object.assign(task, applyTaskBusinessLogic(node, parentChain, nodeId));
         tasks.push(task);
+        return;
+      }
+
+      if (node.type && node.type.resolvedName === "ParentTask") {
+        // 1. Generate the parent Gantt ID
+        const parentGanttId = ++taskId;
+        const dropAreaId = node.linkedNodes && node.linkedNodes["rect-drop-area"];
+        let childTasks = [];
+        let childStartDates = [];
+        let childEndDates = [];
+        // 2. Traverse children FIRST, passing parentGanttId
+        if (dropAreaId && nodes[dropAreaId] && Array.isArray(nodes[dropAreaId].nodes)) {
+          nodes[dropAreaId].nodes.forEach((childId) => {
+            traverse(childId, [
+              ...parentChain,
+              { type: "ParentTask", ganttId: parentGanttId }
+            ]);
+          });
+        }
+        // 3. Collect all immediate children with parent = parentGanttId
+        for (const t of tasks) {
+          if (t.parent === parentGanttId && t.start_date && t.end_date) {
+            childTasks.push(t);
+            childStartDates.push(t.start_date);
+            childEndDates.push(t.end_date);
+          }
+        }
+        // 4. Calculate min/max
+        const minStart = childStartDates.length ? childStartDates.reduce((a, b) => a < b ? a : b) : null;
+        const maxEnd = childEndDates.length ? childEndDates.reduce((a, b) => a > b ? a : b) : null;
+        // 5. Create the ParentTask Gantt task with the *same* ID
+        let parentTask = createEmptyTask();
+        Object.assign(parentTask, {
+          id: parentGanttId,
+          text: node.props.name || "",
+          start_date: minStart,
+          end_date: maxEnd,
+          $rendered_type: "project",
+          type: "project",
+          parent: (parentChain.slice().reverse().find(p => p.type === "ParentTask" && p.ganttId) || {}).ganttId || 0,
+          $rendered_parent: (parentChain.slice().reverse().find(p => p.type === "ParentTask" && p.ganttId) || {}).ganttId || 0,
+        });
+        tasks.push(parentTask);
         return;
       }
   
