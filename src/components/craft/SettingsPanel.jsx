@@ -21,7 +21,7 @@ export const SettingsPanel = () => {
     }
   });
 
-  return <Box bgcolor="rgba(0, 0, 0, 0.06)" mt={2} px={2} py={2}>
+  return <Box bgcolor="rgba(0, 0, 0, 0.06)" mt={2} px={2} py={2} width={"400px"}>
   <Grid container direction="column" spacing={0}>
     <Grid item>
       <Box pb={2}>

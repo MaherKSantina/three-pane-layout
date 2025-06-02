@@ -72,10 +72,9 @@ export function CSCEDate({ children }) {
           padding: 14,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
           transition: "border 0.18s",
+          overflow: "auto"
         }}>
-          {children}
         </Element>
       </div>
     );

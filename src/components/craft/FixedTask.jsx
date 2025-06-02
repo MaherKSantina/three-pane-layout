@@ -24,7 +24,7 @@ export function FixedTask() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: "center",
+          overflow: "auto"
         }}
       >
         {/* X button */}

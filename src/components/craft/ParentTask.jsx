@@ -74,7 +74,7 @@ export function ParentTask({ children }) {
           padding: 14,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          overflow: "auto",
           transition: "border 0.18s",
         }}>
           {children}

@@ -384,6 +384,11 @@ export function normalizeGanttData(data = []) {
         tasks.push(parentTask);
         return;
       }
+
+      if(node.type && node.type.resolvedName === "Async") {
+        let t = craftNodeToTree(nodeId, nodes)
+        console.log(t)
+      }
   
       // --- 5. Fallback: generic traverse for nodes/linkedNodes ---
       if (Array.isArray(node.nodes)) {
@@ -408,3 +413,247 @@ export function normalizeGanttData(data = []) {
     };
   }
   
+  export function craftNodeToTree(nodeId, nodes) {
+    const node = nodes[nodeId];
+    if (!node) return null;
+  
+    // Build children object for linkedNodes
+    let children = undefined;
+    if (node.linkedNodes && Object.keys(node.linkedNodes).length > 0) {
+      children = {};
+      for (const [slot, linkedNodeId] of Object.entries(node.linkedNodes)) {
+        const linkedNode = nodes[linkedNodeId];
+        // Each slot is always a canvas, so look for .nodes array
+        if (linkedNode && Array.isArray(linkedNode.nodes)) {
+          children[slot] = linkedNode.nodes
+            .map(childId => craftNodeToTree(childId, nodes))
+            .filter(Boolean);
+          // Optionally: include the linked node itself in the children array
+          // (commented out, but you can use this if you want)
+          // children[slot].unshift(craftNodeToTree(linkedNodeId, nodes));
+        }
+      }
+    }
+  
+    // Compose the result object
+    const result = {
+      id: nodeId,
+      ...node,
+      ...(children ? { children } : {}),
+    };
+  
+    return result;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+  function expandNodeTree(nodeId, nodesMap) {
+    const node = nodesMap[nodeId];
+    if (!node) return null;
+  
+    // Build base
+    let result = {
+      id: nodeId,
+      ...node,
+      // We'll overwrite nodes and linkedNodes below to hold objects instead of IDs
+    };
+  
+    // Expand `nodes` array
+    if (Array.isArray(node.nodes)) {
+      result.nodes = node.nodes.map(childId => expandNodeTree(childId, nodesMap));
+    }
+  
+    // Expand `linkedNodes` values
+    if (node.linkedNodes && typeof node.linkedNodes === 'object') {
+      result.linkedNodes = {};
+      for (const [key, linkedId] of Object.entries(node.linkedNodes)) {
+        result.linkedNodes[key] = expandNodeTree(linkedId, nodesMap);
+      }
+    }
+  
+    return result;
+  }
+
+
+// Helper: Converts a Craft node (and its children) to tree format for POST body
+// (Assumes you already have this function)
+// function craftNodeToTree(nodeId, nodes) { ... }
+
+function isCanvas(nodeType) {
+  // Define which types should be canvas nodes
+  const canvasTypes = new Set([
+    "ParentTask",
+    "Sequential",
+    "CSCEDate"
+  ]);
+  return canvasTypes.has(nodeType);
+}
+
+export async function handleCraftTreeWithAsyncNodes(nodes) {
+
+  // Helper: Recursively process nodes and replace Async nodes
+  async function processNode(nodeId, nodesMap, parentId = null) {
+    const node = nodesMap[nodeId];
+    if (!node) return { nodesMap };
+
+    let nodesMapResult = { ...nodesMap };
+    if (Array.isArray(node.nodes)) {
+      for (const childId of node.nodes) {
+        const res = await processNode(childId, nodesMapResult, nodeId);
+        nodesMapResult = res.nodesMap;
+      }
+    }
+    if (node.linkedNodes) {
+      for (const childId of Object.values(node.linkedNodes)) {
+        const res = await processNode(childId, nodesMapResult, nodeId);
+        nodesMapResult = res.nodesMap;
+      }
+    }
+
+    // If this is an Async node, do the API call and replace it
+    if (node.type?.resolvedName === "Async" && node.props?.type && node.props?.type !== "") {
+      const expandedTree = expandNodeTree(nodeId, nodesMapResult);
+      // POST async node as body
+      const resp = await fetch(
+        `http://localhost:3000/async/${node.props?.type || ""}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(expandedTree),
+        }
+      );
+      let apiData
+      try {
+        apiData = await resp.json();
+      } catch(e) {
+        console.log(e)
+        return { nodesMapResult }
+      }
+
+      // Recursively flatten API response to Craft nodes
+      function flattenApiNode(apiNode, parent) {
+        if (!apiNode) return {};
+        const nodeId = apiNode.id || Math.random().toString(36).slice(2);
+        const craftNode = {
+          type: { resolvedName: apiNode.type },
+          isCanvas: isCanvas(apiNode.type),
+          props: apiNode.props || {},
+          displayName: apiNode.type,
+          custom: {},
+          hidden: false,
+          parent,
+          nodes: [],
+          linkedNodes: {},
+        };
+        let newNodes = { [nodeId]: craftNode };
+        let updatedParents = {}
+        // Dropzone handling
+        if (apiNode.children && typeof apiNode.children === "object") {
+          for (const dropzoneKey in apiNode.children) {
+            const childrenArr = apiNode.children[dropzoneKey];
+            const dropzoneId = Math.random().toString(36).slice(2);
+            craftNode.linkedNodes[dropzoneKey] = dropzoneId;
+            newNodes[dropzoneId] = {
+              type: "div",
+              isCanvas: true,
+              props: {
+                style: {
+                  width: "100%",
+                  minHeight: 40,
+                  border: "2px dashed #b5cffa",
+                  background: "#fff",
+                  borderRadius: 6,
+                  padding: 14,
+                  display: "flex",
+                  alignItems: "center",
+                  overflow: "auto",
+                  transition: "border 0.18s"
+                }
+              },
+              displayName: "div",
+              custom: {},
+              parent: nodeId,
+              hidden: false,
+              nodes: [],
+              linkedNodes: {}
+            };
+            for (const child of childrenArr) {
+              if (child.type === "reference") {
+                newNodes[dropzoneId].nodes.push(child.id);
+                updatedParents[child.id] = dropzoneId
+              } else {
+                const {nodes: childResult} = flattenApiNode(child, dropzoneId);
+                const ids = Object.keys(childResult);
+                const rootId = ids.find(id => childResult[id].parent === dropzoneId);
+                if (rootId) newNodes[dropzoneId].nodes.push(rootId);
+                Object.assign(newNodes, childResult);
+              }
+            }
+          }
+        }
+        return { nodes: newNodes, rootId: nodeId, updatedParents};
+      }
+
+      // Remove Async node from nodesMap
+      const updatedNodes = { ...nodesMapResult };
+      for(let k of Object.keys(node.linkedNodes)) {
+        delete updatedNodes[node.linkedNodes[k]]
+      }
+      delete updatedNodes[nodeId];
+
+      // Flatten and add new nodes
+      const { nodes: flatNewNodes, rootId: newRootId, updatedParents } = flattenApiNode(apiData, parentId);
+      Object.entries(flatNewNodes).forEach(([id, n]) => {
+        updatedNodes[id] = n;
+      });
+
+      Object.entries(updatedParents).forEach(([k, v]) => {
+        updatedNodes[k].parent = v
+      })
+
+      if (parentId && updatedNodes[parentId]) {
+        if (Array.isArray(updatedNodes[parentId].nodes)) {
+          updatedNodes[parentId].nodes = updatedNodes[parentId].nodes.map(
+            id => id === nodeId ? newRootId : id
+          );
+        }
+        // Handle linkedNodes if that's where the node was
+        for (let k in updatedNodes[parentId].linkedNodes) {
+          if (updatedNodes[parentId].linkedNodes[k] === nodeId) {
+            updatedNodes[parentId].linkedNodes[k] = newRootId;
+          }
+        }
+      }
+
+      // Recursively process new nodes (in case they contain Async too!)
+      let finalNodesMap = {}
+      for (const [id, n] of Object.entries(flatNewNodes)) {
+         const res = await processNode(id, updatedNodes, n.parent);
+         finalNodesMap = {...finalNodesMap, ...res.nodesMap}
+      }
+      return { nodesMap: finalNodesMap };
+    }
+
+    return { nodesMap: nodesMapResult };
+  }
+
+  // Start recursion from all ROOT children
+  let nodesMap = { ...nodes };
+  if (nodes.ROOT && Array.isArray(nodes.ROOT.nodes)) {
+    for (const nodeId of nodes.ROOT.nodes) {
+      const res = await processNode(nodeId, nodesMap, "ROOT");
+      nodesMap = res.nodesMap;
+    }
+  }
+  return nodesMap;
+}
+
+

@@ -2,10 +2,21 @@ import { useMemo } from "react"
 import { CraftContext, GanttContext } from "../contexts/StoreContext"
 import { useCraftLocalStore } from "../stores/craft.local"
 import { createGanttSyncStore, useSyncCraftToGantt } from "../stores/gantt.craft"
-import { craftTreeToGanttData } from "../utils/gantthelper"
+import { craftTreeToGanttData, handleCraftTreeWithAsyncNodes } from "../utils/gantthelper"
 import EditorPage from "./craft/Craft"
 import GanttChart from "./GanttChart"
 import VerticalSplitPane from "./VerticalSplitPane2"
+import { CSCEDate } from "./craft/CSCEDate"
+import { DynamicTask } from "./craft/DynamicTask"
+import { FixedTask } from "./craft/FixedTask"
+import { Sequential } from "./craft/Sequential"
+import { ParentTask } from "./craft/ParentTask"
+import { Async } from "./craft/Async"
+import SplitPane from "./SplitPane2"
+import { TextField } from "@mui/material"
+import AggregatedCraft from "./craft/AggregatedCraft"
+import { useCraftAggregatedStore } from "../stores/craft.aggregated"
+import { CraftAggregatedSyncBridge } from "./craft/CraftAggregatedSyncBridge"
 
 function CraftGanttSyncBridge({ craftStore, ganttStore, craftTreeToGanttData }) {
     useSyncCraftToGantt(craftStore, ganttStore, craftTreeToGanttData);
@@ -15,24 +26,50 @@ function CraftGanttSyncBridge({ craftStore, ganttStore, craftTreeToGanttData }) 
 export default function CraftGantt() {
     const name = "craftngantt";
     const craftStore = useCraftLocalStore(`${name}/Craft`);
+    const aggregatedStore = useCraftAggregatedStore();
   
     // Create a single gantt store instance per component mount
     const ganttStore = useMemo(() => createGanttSyncStore(), []);
   
     return (
-        <CraftContext.Provider value={craftStore}>
       <GanttContext.Provider value={ganttStore}>
         <CraftGanttSyncBridge
-            craftStore={craftStore}
+            craftStore={aggregatedStore}
             ganttStore={ganttStore}
             craftTreeToGanttData={craftTreeToGanttData}
             />
+            <CraftAggregatedSyncBridge
+                sourceStore={craftStore}
+                aggregatedStore={aggregatedStore}
+                handleCraftTreeWithAsyncNodes={handleCraftTreeWithAsyncNodes}
+            />
           <VerticalSplitPane
             initialSplit={0.6}
-            top={<EditorPage />}
+            top={
+                <SplitPane initialSplit={0.5} left={
+                <EditorPage resolver={{
+                    CSCEDate,
+                    DynamicTask,
+                    FixedTask,
+                    Sequential,
+                    ParentTask,
+                    Async
+                }} toolbox={[CSCEDate, DynamicTask, FixedTask, Sequential, ParentTask, Async]} craftStore={craftStore}></EditorPage>
+                }
+                right={<EditorPage style={{ width: "100%", height: "100%" }} resolver={{
+                            CSCEDate,
+                            DynamicTask,
+                            FixedTask,
+                            Sequential,
+                            ParentTask,
+                            Async
+                          }} toolbox={[]} isReadOnly={true} craftStore={aggregatedStore}></EditorPage>}
+                >
+                    
+                </SplitPane>
+            }
             bottom={<GanttChart />}
           />
       </GanttContext.Provider>
-      </CraftContext.Provider>
     );
   }

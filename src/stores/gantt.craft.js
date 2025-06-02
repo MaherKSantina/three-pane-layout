@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { create } from "zustand";
+import { handleCraftTreeWithAsyncNodes } from "../utils/gantthelper";
 
 export function createGanttSyncStore() {
   return create((set) => ({
@@ -16,12 +17,9 @@ export function createGanttSyncStore() {
 export function useSyncCraftToGantt(craftStore, ganttStore, craftTreeToGanttData) {
   const nodes = craftStore((state) => state.nodes);
   useEffect(() => {
-    if (nodes && Object.keys(nodes).length > 0) {
-      const data = craftTreeToGanttData(nodes);
-      console.log("Updated!")
-      ganttStore.getState().setGantt({tasks: data.tasks, links: data.links});
-    } else {
-      ganttStore.getState().setGantt({ tasks: [], links: [] });
-    }
+    const data = craftTreeToGanttData(nodes);
+    console.log("Updated!")
+    ganttStore.getState().setGantt({tasks: data.tasks, links: data.links});
+    
   }, [nodes, ganttStore, craftTreeToGanttData]);
 }

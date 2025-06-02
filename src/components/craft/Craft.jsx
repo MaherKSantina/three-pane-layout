@@ -9,7 +9,7 @@ import { Sequential } from "./Sequential";
 import { ParentTask } from "./ParentTask";
 
 // ---- Toolbox for adding components ----
-function Toolbox() {
+function Toolbox({toolbox}) {
     const { connectors } = useEditor();
     return (
         <div style={{
@@ -17,17 +17,12 @@ function Toolbox() {
             padding: 12, background: "#f0f3f8", minWidth: 180, borderRight: "1px solid #dbe4ed"
         }}>
             <span style={{ fontWeight: 600, marginBottom: 8 }}>Toolbox</span>
-            {CSCEDate.toolbox(connectors)}
-            {DynamicTask.toolbox(connectors)}
-            {FixedTask.toolbox(connectors)}
-            {Sequential.toolbox(connectors)}
-            {ParentTask.toolbox(connectors)}
+            {toolbox.map(x => x.toolbox(connectors))}
         </div>
     );
 }
 
-function CraftRehydrator() {
-    const craftStore = useContext(CraftContext);
+function CraftRehydrator({isReadOnly, craftStore}) {
   // Subscribe to nodes
   const nodes = craftStore((state) => state.nodes);
   
@@ -40,21 +35,20 @@ function CraftRehydrator() {
           actions.deserialize(nodes);
         }
         // eslint-disable-next-line
-      }, []); // Note: No dependency on nodes!
+      }, isReadOnly ? [nodes, enabled, actions] : []); // Note: No dependency on nodes!
       return null;
   }
 
 // ---- Main Editor Page ----
-export default function EditorPage({ width = "100%", height = "100%" }) {
+export default function EditorPage({ width = "100%", height = "100%", resolver, toolbox, isReadOnly, craftStore }) {
 
     const handleNodesChange = (query) => {
+        if (isReadOnly) return
         const json = query.serialize();
         setNodes(JSON.parse(json));
-        console.log(json)
+        // console.log(json)
     };
 
-
-    const craftStore = useCraftStore();
     const setNodes = craftStore((state) => state.setNodes);
 
     return (
@@ -70,18 +64,15 @@ export default function EditorPage({ width = "100%", height = "100%" }) {
                     height: "100%"
                 }}
                 options={{ enabled: true }}
-                resolver={{
-                    CSCEDate,
-                    DynamicTask,
-                    FixedTask,
-                    Sequential,
-                    ParentTask
-                }}
+                resolver={resolver}
                 onNodesChange={handleNodesChange}
             >
-                <CraftRehydrator />
+                <CraftRehydrator isReadOnly={isReadOnly} craftStore={craftStore} />
                 <div style={{ display: "flex", height: "100%", width: "100%" }}>
-                    <Toolbox />
+                    {!isReadOnly ? <Toolbox toolbox={toolbox}>
+                        
+                        </Toolbox> : null }
+                    
                     <div style={{
                         flex: 1,
                         display: "flex",
@@ -100,11 +91,17 @@ export default function EditorPage({ width = "100%", height = "100%" }) {
                                 borderRadius: 8,
                                 padding: 32,
                                 boxShadow: "0 2px 10px #b1bcce2a",
+                                flexDirection: "row",        // <-- THIS LINE makes it horizontal!
+                                alignItems: "flex-start",    // (optional: top-align items)
+                                gap: 16                      // (optional: spacing between items)
                             }}>
                             </Element>
                         </Frame>
                     </div>
+                    <CraftContext.Provider value={craftStore}>
                     <SettingsPanel></SettingsPanel>
+                    </CraftContext.Provider>
+                    
                 </div>
             </Editor>
         </div>
