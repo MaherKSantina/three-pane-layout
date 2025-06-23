@@ -4,7 +4,7 @@ import { TextField, Stack } from "@mui/material";
 import dayjs from "dayjs";
 import React from "react";
 
-export function CSCEDate({ children }) {
+export function CraftVerticalCanvas({ children, title }) {
     const { connectors: { connect, drag }, id } = useNode();
     const { actions } = useEditor();
     return (
@@ -61,7 +61,7 @@ export function CSCEDate({ children }) {
           fontSize: 18,
           letterSpacing: 0.5
         }}>
-          [start - end] Date
+          {title}
         </div>
         {/* Drop zone */}
         <Element id="rect-drop-area" is="div" canvas style={{
@@ -97,28 +97,13 @@ function Settings() {
 
     return (
       <Stack spacing={2} sx={{ p: 2 }}>
-        <DateTimePicker
-          label="Start Date/Time"
-          value={startDate ? dayjs(startDate) : null}
-          onChange={(newValue) =>
-            setProp((props) => (props.startDate = newValue?.toISOString() || ""))
-          }
-          slotProps={{ textField: { fullWidth: true } }}
-        />
-        <DateTimePicker
-          label="End Date/Time"
-          value={endDate ? dayjs(endDate) : null}
-          onChange={(newValue) =>
-            setProp((props) => (props.endDate = newValue?.toISOString() || ""))
-          }
-          slotProps={{ textField: { fullWidth: true } }}
-        />
+        
       </Stack>
     );
 }  
 
-  CSCEDate.craft = {
-    displayName: "CSCEDate",
+CraftVerticalCanvas.craft = {
+    displayName: "CraftVerticalCanvas",
     props: {},
     canvas: true,
     related: {
@@ -126,10 +111,10 @@ function Settings() {
     }
   };
 
-  CSCEDate.toolbox = (connectors) => {
+  CraftVerticalCanvas.toolbox = (connectors) => {
     return (
-      <div ref={ref => connectors.create(ref, <CSCEDate></CSCEDate>)}>
-          <button style={{ width: "100%" }}>CSCEDate</button>
+      <div ref={ref => connectors.create(ref, <CraftVerticalCanvas></CraftVerticalCanvas>)}>
+          <button style={{ width: "100%" }}>CraftVerticalCanvas</button>
       </div>
     )
   }

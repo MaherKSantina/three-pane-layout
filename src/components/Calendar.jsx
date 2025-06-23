@@ -21,18 +21,50 @@ function convertToISOWithTimezone(dateString, targetTimeZone) {
   return new Date(formattedDate);
 }
 
-export function Calendar({ timeZone = "Australia/Sydney", initialDate }) {
+export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID }) {
   const [open, setOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
+  const [events, setEvents] = useState([])
 
   const calendarRef = useRef(null);
-  const { events, addEvent, updateEvent, fetchEvents } = useStore();
+
+  const fetchEvents = async () => {
+    const res = await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks`);
+    const data = await res.json();
+    setEvents(data);
+  }
+
+  const addEvent = async (event) => {
+    await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks`, {
+      method: "POST",
+      body: JSON.stringify(event),
+      headers: { "Content-Type": "application/json" },
+    });
+    await fetchEvents()
+  }
+
+  const updateEvent = async (id, updates) => {
+    await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(updates),
+      headers: { "Content-Type": "application/json" },
+    });
+    await fetchEvents()
+  }
+
+  const deleteEvent = async (id) => {
+    await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+      method: "DELETE",
+    });
+    await fetchEvents()
+  }
 
   useEffect(() => {
+    if(!itemID) return
     fetchEvents()
-  }, [])
+  }, [itemID])
 
   useEffect(() => {
     if (calendarRef.current) {
@@ -64,6 +96,12 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate }) {
     } else {
       addEvent({ ...event, id: Date.now().toString() });
     }
+  };
+
+  const handleDeleteEvent = async (id) => {
+    deleteEvent(id)
+    setEditOpen(false);
+    setSelectedEvent(null);
   };
 
   const handleAddNew = () => {
@@ -138,6 +176,7 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate }) {
         initialData={editData}
         onClose={() => setEditOpen(false)}
         onSave={handleSaveEvent}
+        onDelete={handleDeleteEvent}
         timeZone={timeZone}
       />
     </Box>

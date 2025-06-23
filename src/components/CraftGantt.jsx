@@ -18,21 +18,32 @@ import AggregatedCraft from "./craft/AggregatedCraft"
 import { useCraftAggregatedStore } from "../stores/craft.aggregated"
 import { CraftAggregatedSyncBridge } from "./craft/CraftAggregatedSyncBridge"
 
-function CraftGanttSyncBridge({ craftStore, ganttStore, craftTreeToGanttData }) {
+function CraftGanttSyncBridge({ craftStore, ganttStore, craftTreeToGanttData}) {
     useSyncCraftToGantt(craftStore, ganttStore, craftTreeToGanttData);
     return null;
   }
 
-export default function CraftGantt() {
+export default function CraftGantt({hideAggregated = true}) {
     const name = "craftngantt";
     const craftStore = useCraftLocalStore(`${name}/Craft`);
     const aggregatedStore = useCraftAggregatedStore();
   
     // Create a single gantt store instance per component mount
     const ganttStore = useMemo(() => createGanttSyncStore(), []);
+
+    function editor() {
+        return <EditorPage resolver={{
+            CSCEDate,
+            DynamicTask,
+            FixedTask,
+            Sequential,
+            ParentTask,
+            Async
+        }} toolbox={[CSCEDate, DynamicTask, FixedTask, Sequential, ParentTask, Async]} craftStore={craftStore}></EditorPage>
+    }
   
     return (
-      <GanttContext.Provider value={ganttStore}>
+        <>
         <CraftGanttSyncBridge
             craftStore={aggregatedStore}
             ganttStore={ganttStore}
@@ -45,17 +56,8 @@ export default function CraftGantt() {
             />
           <VerticalSplitPane
             initialSplit={0.6}
-            top={
-                <SplitPane initialSplit={0.5} left={
-                <EditorPage resolver={{
-                    CSCEDate,
-                    DynamicTask,
-                    FixedTask,
-                    Sequential,
-                    ParentTask,
-                    Async
-                }} toolbox={[CSCEDate, DynamicTask, FixedTask, Sequential, ParentTask, Async]} craftStore={craftStore}></EditorPage>
-                }
+            top={hideAggregated ? editor() :
+                <SplitPane initialSplit={0.5} left={editor()}
                 right={<EditorPage style={{ width: "100%", height: "100%" }} resolver={{
                             CSCEDate,
                             DynamicTask,
@@ -68,8 +70,8 @@ export default function CraftGantt() {
                     
                 </SplitPane>
             }
-            bottom={<GanttChart />}
+            bottom={<GanttChart store={ganttStore} />}
           />
-      </GanttContext.Provider>
+          </>
     );
   }

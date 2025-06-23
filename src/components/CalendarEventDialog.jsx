@@ -7,7 +7,7 @@ import {
 
 const { DateTime } = require('luxon');
 
-export default function CalendarEventDialog({ open, onClose, initialData, onSave, timeZone }) {
+export default function CalendarEventDialog({ open, onClose, initialData, onSave, timeZone, onDelete }) {
   const [form, setForm] = useState({
     title: '',
     start: '',
@@ -74,6 +74,7 @@ export default function CalendarEventDialog({ open, onClose, initialData, onSave
         />
       </DialogContent>
       <DialogActions>
+        {initialData ? <Button onClick={() => onDelete?.(initialData.id)} variant="contained">Delete</Button> : null}
         <Button onClick={onClose}>Cancel</Button>
         <Button onClick={handleSubmit} variant="contained">Save</Button>
       </DialogActions>

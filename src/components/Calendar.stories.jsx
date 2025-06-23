@@ -24,9 +24,7 @@ export const Default = {
 export const API = {
   render() {
     return (
-      <StoreContext.Provider value={useCalendarApiStore()}>
-      <Calendar></Calendar>
-    </StoreContext.Provider>
+      <Calendar itemID={11}></Calendar>
     )
   }
 };

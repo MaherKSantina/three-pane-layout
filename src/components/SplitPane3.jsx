@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect, cloneElement } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
-// ResizeObserver hook
+// ResizeObserver hook (for any ref)
 function useSizeObserver(ref) {
   const [size, setSize] = useState({ width: 0, height: 0 });
 
@@ -26,14 +26,27 @@ export default function SplitPane({
   height = "100%",
   minRatio = 0.1,
   maxRatio = 0.9,
+  onLeftDimensionChange,
+  onRightDimensionChange,
 }) {
   const [splitRatio, setSplitRatio] = useState(initialSplit);
   const containerRef = useRef(null);
+  const leftRef = useRef(null);
+  const rightRef = useRef(null);
+
   const containerSize = useSizeObserver(containerRef);
+  const leftSize = useSizeObserver(leftRef);
+  const rightSize = useSizeObserver(rightRef);
 
   const dividerWidth = 8;
-  const leftWidth = containerSize.width * splitRatio;
-  const rightWidth = containerSize.width - leftWidth;
+  const leftWidth = right
+    ? containerSize.width * splitRatio - dividerWidth / 2
+    : containerSize.width;
+  const rightWidth = right
+    ? containerSize.width - leftWidth - dividerWidth
+    : 0;
+
+    onLeftDimensionChange?.(leftWidth, leftSize.height)
 
   const wrapperStyle = {
     display: "flex",
@@ -53,7 +66,23 @@ export default function SplitPane({
     overflow: "auto",
     boxSizing: "border-box",
     height: "100%",
+    width: "100%", // fallback
   };
+
+  // Callbacks for left and right dimension changes
+  useEffect(() => {
+    if (onLeftDimensionChange) {
+      onLeftDimensionChange(leftSize.width, leftSize.height);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leftSize.width, leftSize.height]);
+
+  useEffect(() => {
+    if (onRightDimensionChange) {
+      onRightDimensionChange(rightSize.width, rightSize.height);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rightSize.width, rightSize.height]);
 
   const onPointerDown = (e) => {
     if (!containerRef.current) return;
@@ -78,42 +107,44 @@ export default function SplitPane({
   return (
     <div data-testid="splitpane-wrapper" style={wrapperStyle}>
       <div data-testid="splitpane-container" style={containerStyle} ref={containerRef}>
+        {/* Left Pane */}
         <div
+          ref={leftRef}
           data-testid="splitpane-left"
-          style={{ ...paneStyle, width: leftWidth - dividerWidth / 2 }}
+          style={{
+            ...paneStyle,
+            width: leftWidth,
+          }}
         >
-          {left &&
-          leftWidth > dividerWidth &&
-            containerSize.height &&
-            cloneElement(left, {
-              width: `${leftWidth - dividerWidth / 2}px`,
-              height: `${containerSize.height}px`,
-            })}
+          {left}
         </div>
         {/* Draggable Divider */}
-        <div
-          style={{
-            width: dividerWidth,
-            background: "#e0e0e0",
-            cursor: "col-resize",
-            height: "100%",
-            zIndex: 1,
-            position: "relative",
-          }}
-          onPointerDown={onPointerDown}
-        />
-        <div
-          data-testid="splitpane-right"
-          style={{ ...paneStyle, width: rightWidth - dividerWidth / 2 }}
-        >
-          {right &&
-          rightWidth > dividerWidth &&
-            containerSize.height &&
-            cloneElement(right, {
-              width: `${rightWidth - dividerWidth / 2}px`,
-              height: `${containerSize.height}px`,
-            })}
-        </div>
+        {right && (
+          <div
+            style={{
+              width: dividerWidth,
+              background: "#e0e0e0",
+              cursor: "col-resize",
+              height: "100%",
+              zIndex: 1,
+              position: "relative",
+            }}
+            onPointerDown={onPointerDown}
+          />
+        )}
+        {/* Right Pane */}
+        {right && (
+          <div
+            ref={rightRef}
+            data-testid="splitpane-right"
+            style={{
+              ...paneStyle,
+              width: rightWidth,
+            }}
+          >
+            {right}
+          </div>
+        )}
       </div>
     </div>
   );

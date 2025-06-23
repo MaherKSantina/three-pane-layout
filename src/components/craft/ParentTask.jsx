@@ -12,6 +12,7 @@ export function ParentTask({ children }) {
       <div
         ref={ref => connect(drag(ref))}
         style={{
+          flex: 1,
           minHeight: 120,
           minWidth: 220,
           padding: 24,

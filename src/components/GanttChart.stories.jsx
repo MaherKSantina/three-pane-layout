@@ -1,10 +1,10 @@
 import { GanttContext, StoreContext } from '../contexts/StoreContext';
-import { useApiGanttStore } from '../stores/gantt.api';
+import { createApiGanttStore } from '../stores/gantt.api';
 import { useGanttLocalStore } from '../stores/gantt.local';
 import GanttChart from './GanttChart';
 
 const meta = {
-  title: "Visualization/Gantt/Main",
+  title: "Visualization/Gantt/Chart/Main",
   component: GanttChart,
 };
 
@@ -20,12 +20,20 @@ export const Default = {
   }
 };
 
-export const API = {
+// export const API = {
+//   render() {
+//     return (
+//       <GanttContext.Provider value={useApiGanttStore()}>
+//       <GanttChart height={"100vh"} />
+//     </GanttContext.Provider>
+//     )
+//   }
+// };
+
+export const Career = {
   render() {
     return (
-      <GanttContext.Provider value={useApiGanttStore()}>
-      <GanttChart height={"100vh"} />
-    </GanttContext.Provider>
+      <GanttChart height={"100vh"} store={createApiGanttStore("career")} />
     )
   }
 };
