@@ -14,7 +14,7 @@ export default meta;
 function DefaultRender() {
   const [currentItem, setCurrentItem] = useState(null)
 
-  return <SplitPane initialSplit={0.2} left={<FullHeightListWithAddDialog listKey={"processes"} onItemClick={(i) => {
+  return <SplitPane initialSplit={0.2} left={<FullHeightListWithAddDialog listKey={"calendars"} onItemClick={(i) => {
       setCurrentItem(i)
   }}></FullHeightListWithAddDialog>} right={<CalendarWithTasksList itemID={currentItem?.id}></CalendarWithTasksList>}></SplitPane>
 }

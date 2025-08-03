@@ -21,7 +21,7 @@ function convertToISOWithTimezone(dateString, targetTimeZone) {
   return new Date(formattedDate);
 }
 
-export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID }) {
+export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID, slotDuration = "00:10:00" }) {
   const [open, setOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [editOpen, setEditOpen] = useState(false);
@@ -31,7 +31,7 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID })
   const calendarRef = useRef(null);
 
   const fetchEvents = async () => {
-    const res = await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks`);
+    const res = await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks/compiled`);
     const data = await res.json();
     setEvents(data);
   }
@@ -117,13 +117,16 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID })
   return (
     <Box sx={{ m: 2, height: "calc(100vh - 64px)", overflowY: "auto" }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+        <Button onClick={fetchEvents} variant="contained">Refresh</Button>
         <Button onClick={handleAddNew} variant="contained">New Event</Button>
       </Box>
 
       <FullCalendar
+      slotDuration={slotDuration}
+      eventOverlap={false}
         ref={calendarRef}
         plugins={[dayGridPlugin, listPlugin, timeGridPlugin]}
-        initialView="dayGridMonth"
+        initialView="timeGridWeek"
         height="auto"
         contentHeight="auto"
         expandRows={true}
@@ -188,6 +191,7 @@ function renderEventContent(eventInfo) {
     <>
       <b>{eventInfo.timeText}</b>
       <i>{eventInfo.event.title}</i>
+      <div dangerouslySetInnerHTML={{__html: eventInfo.event.extendedProps.description}}></div>
     </>
   );
 }

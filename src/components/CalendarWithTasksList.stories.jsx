@@ -11,3 +11,9 @@ export const Default = {
     return <CalendarWithTasksList itemID={11}></CalendarWithTasksList>
   }
 };
+
+export const Current = {
+  render() {
+    return <CalendarWithTasksList itemID={11} ></CalendarWithTasksList>
+  }
+}

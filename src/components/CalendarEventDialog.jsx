@@ -13,21 +13,38 @@ export default function CalendarEventDialog({ open, onClose, initialData, onSave
     start: '',
     end: '',
     description: '',
+    definitionKey: '',
+    args: ''
   });
 
   useEffect(() => {
     if (initialData) {
-      const start = DateTime.fromISO(initialData.start.toISOString(), { zone: 'utc' }).setZone(timeZone);
-      const end = DateTime.fromISO(initialData.end.toISOString(), { zone: 'utc' }).setZone(timeZone);
+      let start = ""
+      if(initialData.start) {
+        start = DateTime.fromISO(initialData.start.toISOString(), { zone: 'utc' }).setZone(timeZone).toFormat("yyyy-MM-dd'T'HH:mm");
+      }
+
+      let end = ""
+      if(initialData.end) {
+        end = DateTime.fromISO(initialData.end.toISOString(), { zone: 'utc' }).setZone(timeZone).toFormat("yyyy-MM-dd'T'HH:mm");
+      }
+
+      let args = ""
+      if(initialData.args) {
+        args = JSON.stringify(initialData.args)
+      }
+      
 
       setForm({
         title: initialData.title || '',
-        start: start.toFormat("yyyy-MM-dd'T'HH:mm"),
-        end: end.toFormat("yyyy-MM-dd'T'HH:mm"),
+        start,
+        end,
         description: initialData.description || '',
+        definitionKey: initialData.definitionKey || '',
+        args
       });
     } else {
-      setForm({ title: '', start: '', end: '', description: '' });
+      setForm({ title: '', start: '', end: '', description: '', definitionKey: '',  args: ''});
     }
   }, [initialData, timeZone]);
 
@@ -37,16 +54,22 @@ export default function CalendarEventDialog({ open, onClose, initialData, onSave
   };
 
   const handleSubmit = () => {
-    const startUtc = DateTime.fromFormat(form.start, "yyyy-MM-dd'T'HH:mm", { zone: timeZone }).toUTC();
-    const endUtc = DateTime.fromFormat(form.end, "yyyy-MM-dd'T'HH:mm", { zone: timeZone }).toUTC();
+    function removingEmpty(field) {
+      return field === '' ? null : field
+    }
+    function getNotEmptyDate(field) {
+      return field === '' ? null : DateTime.fromFormat(field, "yyyy-MM-dd'T'HH:mm", { zone: timeZone }).toUTC()
+    }
 
     onSave({
       id: initialData?.id,
-      title: form.title,
-      description: form.description,
-      start: startUtc.toISO(),
-      end: endUtc.toISO(),
+      title: removingEmpty(form.title),
+      description: removingEmpty(form.description),
+      start: getNotEmptyDate(form.start)?.toISO(),
+      end: getNotEmptyDate(form.end)?.toISO(),
       timeZone,
+      definitionKey: removingEmpty(form.definitionKey),
+      args: removingEmpty(form.args) ? JSON.parse(form.args) : null
     });
 
     onClose();
@@ -54,7 +77,7 @@ export default function CalendarEventDialog({ open, onClose, initialData, onSave
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{initialData ? 'Edit Event' : 'New Event'}</DialogTitle>
+      <DialogTitle>{initialData ? initialData.id : 'New Event'}</DialogTitle>
       <DialogContent>
         <TextField
           label="Title" name="title" fullWidth margin="dense"
@@ -71,6 +94,14 @@ export default function CalendarEventDialog({ open, onClose, initialData, onSave
         <TextField
           label="Description" name="description" fullWidth margin="dense"
           value={form.description} onChange={handleChange}
+        />
+        <TextField
+          label="Definition Key" name="definitionKey" fullWidth margin="dense"
+          value={form.definitionKey} onChange={handleChange}
+        />
+        <TextField
+          label="Args" name="args" fullWidth margin="dense"
+          value={form.args} onChange={handleChange}
         />
       </DialogContent>
       <DialogActions>

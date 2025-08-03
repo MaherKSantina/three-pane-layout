@@ -12,6 +12,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
+import CalendarEventDialog from './CalendarEventDialog';
 
 const Item = styled('div')(({ theme }) => ({
   border: '1px solid',
@@ -25,12 +26,45 @@ const Item = styled('div')(({ theme }) => ({
 
 export default function FullHeightCalendarTasksList({ itemID, width, onItemClick }) {
 const [items, setItems] = useState([])
+const [editOpen, setEditOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
   
     const fetchItems = async () => {
         const res = await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks`);
         const data = await res.json();
         setItems(data)
     }
+
+    const deleteItem = async (id) => {
+      await fetch(`http://localhost:3000/calendar-tasks/${id}`, { method: 'DELETE' });
+      await fetchItems();
+    }
+
+    const updateEvent = async (id, updates) => {
+      await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(updates),
+        headers: { "Content-Type": "application/json" },
+      });
+      await fetchItems()
+    }
+
+    const handleSaveEvent = (event) => {
+    if (event.id) {
+      updateEvent(event.id, event);
+    }
+  };
+
+  const openEditDialog = (item) => {
+    setEditData(item);
+    setEditOpen(true);
+  };
+
+  const handleDeleteEvent = async (id) => {
+    deleteItem(id)
+    setEditOpen(false);
+    setEditData(null);
+  };
 
   useEffect(() => {
     fetchItems();
@@ -56,6 +90,16 @@ const [items, setItems] = useState([])
                     key={item.id}
                     button
                     onClick={() => handleItemClick(item)}
+                    secondaryAction={
+                      <>
+                      <IconButton onClick={() => openEditDialog(item)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton onClick={() => deleteItem(item.id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </>
+                    }
                   >
                     <ListItemText primary={item.title} />
                   </ListItem>
@@ -69,6 +113,14 @@ const [items, setItems] = useState([])
           </Item>
         </Grid>
       </Grid>
+      <CalendarEventDialog
+              open={editOpen}
+              initialData={editData}
+              onClose={() => setEditOpen(false)}
+              onSave={handleSaveEvent}
+              onDelete={handleDeleteEvent}
+              timeZone={editData?.timeZone}
+            />
     </Box>
   );
 }
