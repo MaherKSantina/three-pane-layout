@@ -19,26 +19,6 @@ const KonvaView = forwardRef((props, ref) => {
     const layer = new Konva.Layer();
     stageRef.current.add(layer);
 
-    // Add a Text node to show coordinates
-    const coordText = new Konva.Text({
-    x: 10,
-    y: 10,
-    fontSize: 18,
-    fill: '#333',
-    text: 'x: 0, y: 0',
-    });
-    layer.add(coordText);
-    layer.draw();
-
-    // Listen for mousemove on the stage
-    stageRef.current.on('mousemove', (e) => {
-    const pos = stageRef.current.getPointerPosition();
-    if (pos) {
-        coordText.text(`x: ${Math.round(pos.x)}, y: ${Math.round(pos.y)}`);
-        layer.batchDraw();
-    }
-    });
-
     // Add initial layers if needed
     return () => {
       stageRef.current.destroy();
@@ -78,8 +58,21 @@ const KonvaView = forwardRef((props, ref) => {
 
     stage.on("wheel", handleWheel);
 
-    // Cleanup
-    return () => stage.off("wheel", handleWheel);
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowUp") props.onKeyDown("up");
+      if (e.key === "ArrowDown") props.onKeyDown("down");
+      if (e.key === "ArrowLeft") props.onKeyDown("left");
+      if (e.key === "ArrowRight") props.onKeyDown("right");
+    };
+
+    // Listen on the container div
+    const div = containerRef.current;
+    div.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      div.removeEventListener("keydown", handleKeyDown);
+      stage.off("wheel", handleWheel);
+    };
   }, []);
 
   // Expose methods to parent
@@ -101,6 +94,7 @@ const KonvaView = forwardRef((props, ref) => {
         });
         layer.add(v);
         layer.draw()
+        return v
     },
     addShape: (layer, shapeType, shapeProps) => {
       let shape;
@@ -152,7 +146,7 @@ const KonvaView = forwardRef((props, ref) => {
     getLayers: () => layersRef.current,
   }));
 
-  return <div ref={containerRef} style={{ width: props.width || 600, height: props.height || 400 }} />;
+  return <div ref={containerRef} tabIndex={0} style={{ width: props.width || 600, height: props.height || 400 }} />;
 });
 
 export default KonvaView;

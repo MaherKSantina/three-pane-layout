@@ -5,14 +5,14 @@ export const useApiCraftStore = create((set, get) => ({
   setNodes: async (nodes) => {
     set({ nodes });
     // replace this with your real API endpoint
-    await fetch("http://localhost:3000/craft-nodes", {
+    await fetch("https://api-digitalsymphony.ngrok.pizza/craft-nodes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nodes }),
     });
   },
   fetchNodes: async () => {
-    const res = await fetch("http://localhost:3000/craft-nodes");
+    const res = await fetch("https://api-digitalsymphony.ngrok.pizza/craft-nodes");
     const data = await res.json();
     set({ nodes: data.nodes });
   },

@@ -3,12 +3,12 @@ import { create } from "zustand";
 export const useCalendarApiStore = create((set, get) => ({
   events: [],
   fetchEvents: async () => {
-    const res = await fetch("http://localhost:3000/calendar-tasks");
+    const res = await fetch("https://api-digitalsymphony.ngrok.pizza/calendar-tasks");
     const data = await res.json();
     set({ events: data });
   },
   addEvent: async (event) => {
-    const res = await fetch("http://localhost:3000/calendar-tasks", {
+    const res = await fetch("https://api-digitalsymphony.ngrok.pizza/calendar-tasks", {
       method: "POST",
       body: JSON.stringify(event),
       headers: { "Content-Type": "application/json" },
@@ -17,7 +17,7 @@ export const useCalendarApiStore = create((set, get) => ({
     await get().fetchEvents()
   },
   updateEvent: async (id, updates) => {
-    await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/calendar-tasks/${id}`, {
       method: "PUT",
       body: JSON.stringify(updates),
       headers: { "Content-Type": "application/json" },
@@ -25,7 +25,7 @@ export const useCalendarApiStore = create((set, get) => ({
     await get().fetchEvents()
   },
   deleteEvent: async (id) => {
-    await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/calendar-tasks/${id}`, {
       method: "DELETE",
     });
     await get().fetchEvents()

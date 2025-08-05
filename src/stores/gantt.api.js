@@ -24,7 +24,7 @@ export const createApiGanttStore = (projectId) => create((set, get) => ({
     if (get().hydrated) return; // skip if already hydrated
     set({ loading: true });
     try {
-      const res = await fetch(`http://localhost:3000/project/${projectId}/gantt-data`);
+      const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/gantt-data`);
       const json = await res.json();
       for(let t of json.tasks) {
         if(t.start_date) {
@@ -47,7 +47,7 @@ export const createApiGanttStore = (projectId) => create((set, get) => ({
   },
 
   addTask: async (task) => {
-    await fetch(`http://localhost:3000/project/${projectId}/tasks`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(task),
@@ -57,7 +57,7 @@ export const createApiGanttStore = (projectId) => create((set, get) => ({
   },
 
   getTask: async (taskId) => {
-    const res = await fetch(`http://localhost:3000/project/${projectId}/tasks/${taskId}`, {
+    const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/tasks/${taskId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" }
     });
@@ -66,7 +66,7 @@ export const createApiGanttStore = (projectId) => create((set, get) => ({
   },
 
   updateTask: async (id, updates) => {
-    await fetch(`http://localhost:3000/project/${projectId}/tasks/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/tasks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
@@ -76,13 +76,13 @@ export const createApiGanttStore = (projectId) => create((set, get) => ({
   },
 
   deleteTask: async (id) => {
-    await fetch(`http://localhost:3000/project/${projectId}/tasks/${id}`, { method: "DELETE" });
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/tasks/${id}`, { method: "DELETE" });
     set({hydrated: false})
     await get().fetchData();
   },
 
   addLink: async (link) => {
-    const res = await fetch(`http://localhost:3000/project/${projectId}/links`, {
+    const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/links`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(link),
@@ -93,12 +93,12 @@ export const createApiGanttStore = (projectId) => create((set, get) => ({
   },
 
   deleteLink: async (id) => {
-    await fetch(`http://localhost:3000/project/${projectId}/links/${id}`, { method: "DELETE" });
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/links/${id}`, { method: "DELETE" });
     set({hydrated: false})
     await get().fetchData();
   },
   updateTaskOrder: async ({ id, before, after }) => {
-    await fetch(`http://localhost:3000/project/${projectId}/tasks/update-order`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/project/${projectId}/tasks/update-order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, before, after }),

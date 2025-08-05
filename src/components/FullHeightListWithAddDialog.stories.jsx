@@ -18,7 +18,7 @@ function DefaultRender() {
 
   async function getNodesAndEdges() {
     if(!currentItem) return
-    let response = await axios.get(`http://localhost:3000/items/${currentItem.id}/graph`)
+    let response = await axios.get(`https://api-digitalsymphony.ngrok.pizza/items/${currentItem.id}/graph`)
     const { nodes, edges } = response.data
     setInitialNodes(nodes)
     setInitialEdges(edges.map(x => {
@@ -35,7 +35,7 @@ function DefaultRender() {
 
   async function saveNodesAndEdges(nodes, edges) {
     if(!currentItem) return
-    let response = await axios.post(`http://localhost:3000/items/${currentItem.id}/graph`, {
+    let response = await axios.post(`https://api-digitalsymphony.ngrok.pizza/items/${currentItem.id}/graph`, {
       nodes,
       edges
     })

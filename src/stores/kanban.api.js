@@ -7,7 +7,7 @@ export const useApiKanbanStore = create((set, get) => ({
 
   fetchData: async () => {
     try {
-      const res = await fetch("http://localhost:3000/columns");
+      const res = await fetch("https://api-digitalsymphony.ngrok.pizza/columns");
       const cols = await res.json(); // includes nested cards
       set({ columns: cols });
     } catch (e) {
@@ -16,7 +16,7 @@ export const useApiKanbanStore = create((set, get) => ({
   },
 
   addColumn: async (title) => {
-    const res = await fetch("http://localhost:3000/columns", {
+    const res = await fetch("https://api-digitalsymphony.ngrok.pizza/columns", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title }),
@@ -26,7 +26,7 @@ export const useApiKanbanStore = create((set, get) => ({
   },
 
   updateColumn: async (id, data) => {
-    await fetch(`http://localhost:3000/columns/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/columns/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -37,13 +37,13 @@ export const useApiKanbanStore = create((set, get) => ({
   },
 
   deleteColumn: async (id) => {
-    await fetch(`http://localhost:3000/columns/${id}`, { method: "DELETE" });
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/columns/${id}`, { method: "DELETE" });
     set((s) => ({ columns: s.columns.filter((c) => c.id !== id) }));
   },
 
   addCard: async (columnId, card) => {
     const res = await fetch(
-      `http://localhost:3000/columns/${columnId}/cards`,
+      `https://api-digitalsymphony.ngrok.pizza/columns/${columnId}/cards`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -61,7 +61,7 @@ export const useApiKanbanStore = create((set, get) => ({
   },
 
   updateCard: async (columnId, cardId, data) => {
-    await fetch(`http://localhost:3000/cards/${cardId}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/cards/${cardId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -81,7 +81,7 @@ export const useApiKanbanStore = create((set, get) => ({
   },
 
   deleteCard: async (columnId, cardId) => {
-    await fetch(`http://localhost:3000/cards/${cardId}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/cards/${cardId}`, {
       method: "DELETE",
     });
     set((s) => ({
@@ -122,7 +122,7 @@ export const useApiKanbanStore = create((set, get) => ({
     if (srcCol) {
       srcCol.cards.forEach((card, idx) => {
         updates.push(
-          fetch(`http://localhost:3000/cards/${card.id}`, {
+          fetch(`https://api-digitalsymphony.ngrok.pizza/cards/${card.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -138,7 +138,7 @@ export const useApiKanbanStore = create((set, get) => ({
     if (dstCol) {
       dstCol.cards.forEach((card, idx) => {
         updates.push(
-          fetch(`http://localhost:3000/cards/${card.id}`, {
+          fetch(`https://api-digitalsymphony.ngrok.pizza/cards/${card.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

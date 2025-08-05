@@ -31,13 +31,13 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID, s
   const calendarRef = useRef(null);
 
   const fetchEvents = async () => {
-    const res = await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks/compiled`);
+    const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/items/${itemID}/calendar-tasks/compiled`);
     const data = await res.json();
     setEvents(data);
   }
 
   const addEvent = async (event) => {
-    await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/items/${itemID}/calendar-tasks`, {
       method: "POST",
       body: JSON.stringify(event),
       headers: { "Content-Type": "application/json" },
@@ -46,7 +46,7 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID, s
   }
 
   const updateEvent = async (id, updates) => {
-    await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/calendar-tasks/${id}`, {
       method: "PUT",
       body: JSON.stringify(updates),
       headers: { "Content-Type": "application/json" },
@@ -55,7 +55,7 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID, s
   }
 
   const deleteEvent = async (id) => {
-    await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/calendar-tasks/${id}`, {
       method: "DELETE",
     });
     await fetchEvents()
@@ -123,6 +123,7 @@ export function Calendar({ timeZone = "Australia/Sydney", initialDate, itemID, s
 
       <FullCalendar
       slotDuration={slotDuration}
+      slotMinTime={"06:00:00"}
       eventOverlap={false}
         ref={calendarRef}
         plugins={[dayGridPlugin, listPlugin, timeGridPlugin]}

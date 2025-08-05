@@ -17,7 +17,7 @@ const Item = styled('div')(({ theme }) => ({
 
 function fetchTransactions() {
   // Replace with your real fetch, or mock here
-  return fetch('http://localhost:3000/transactions').then((res) => res.json());
+  return fetch('https://api-digitalsymphony.ngrok.pizza/transactions').then((res) => res.json());
 }
 
 export default function TransactionsCategorizer() {

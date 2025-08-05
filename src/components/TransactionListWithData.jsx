@@ -41,7 +41,7 @@ let [items, setItems] = useState([])
   const [editingId, setEditingId] = useState(null);
 
   function reloadData() {
-axios.get(`http://localhost:3000/transaction-lists`).then((res) => {
+axios.get(`https://api-digitalsymphony.ngrok.pizza/transaction-lists`).then((res) => {
         setItems(res.data)
     })
   }
@@ -156,7 +156,7 @@ export default function TransactionListWithData() {
     let [transactions, setTransactions] = useState([])
 
     function reloadData() {
-        axios.get(`http://localhost:3000/transaction-lists/${category}/transactions`).then(res => {
+        axios.get(`https://api-digitalsymphony.ngrok.pizza/transaction-lists/${category}/transactions`).then(res => {
             setTransactions(res.data)
         })
     }

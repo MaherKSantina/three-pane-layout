@@ -30,18 +30,18 @@ const [editOpen, setEditOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   
     const fetchItems = async () => {
-        const res = await fetch(`http://localhost:3000/items/${itemID}/calendar-tasks`);
+        const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/items/${itemID}/calendar-tasks`);
         const data = await res.json();
         setItems(data)
     }
 
     const deleteItem = async (id) => {
-      await fetch(`http://localhost:3000/calendar-tasks/${id}`, { method: 'DELETE' });
+      await fetch(`https://api-digitalsymphony.ngrok.pizza/calendar-tasks/${id}`, { method: 'DELETE' });
       await fetchItems();
     }
 
     const updateEvent = async (id, updates) => {
-      await fetch(`http://localhost:3000/calendar-tasks/${id}`, {
+      await fetch(`https://api-digitalsymphony.ngrok.pizza/calendar-tasks/${id}`, {
         method: "PUT",
         body: JSON.stringify(updates),
         headers: { "Content-Type": "application/json" },

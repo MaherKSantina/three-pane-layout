@@ -11,7 +11,7 @@ export default meta;
 function APITransactionList() {
   const [transactions, setTransactions] = useState([])
   useEffect(() => {
-    axios.get("http://localhost:3000/transactions").then(response => {
+    axios.get("https://api-digitalsymphony.ngrok.pizza/transactions").then(response => {
       setTransactions(response.data)
     })
   }, [])

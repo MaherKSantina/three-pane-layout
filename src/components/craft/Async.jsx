@@ -19,7 +19,7 @@ export function Async({ children, type }) {
     }
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:3000/async/${type}`)
+    fetch(`https://api-digitalsymphony.ngrok.pizza/async/${type}`)
       .then(res => {
         if (!res.ok) throw new Error("Fetch error");
         return res.json();

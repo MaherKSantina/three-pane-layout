@@ -523,7 +523,7 @@ export async function handleCraftTreeWithAsyncNodes(nodes) {
       const expandedTree = expandNodeTree(nodeId, nodesMapResult);
       // POST async node as body
       const resp = await fetch(
-        `http://localhost:3000/async/${node.props?.type || ""}`,
+        `https://api-digitalsymphony.ngrok.pizza/async/${node.props?.type || ""}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

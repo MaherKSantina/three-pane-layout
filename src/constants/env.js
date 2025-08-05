@@ -3,5 +3,5 @@ export const env = {
 }
 
 // export const env = {
-//     httpHost: "http://localhost:3000" 
+//     httpHost: "https://api-digitalsymphony.ngrok.pizza" 
 // }

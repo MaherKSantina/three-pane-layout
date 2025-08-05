@@ -7,7 +7,7 @@ export const useApiChatStore = create((set) => ({
 
   fetchMessages: async (chatId) => {
     try {
-      const res = await fetch(`http://localhost:3000/chats/${chatId}/messages`);
+      const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/chats/${chatId}/messages`);
       const data = await res.json();
       set({ messages: data });
     } catch (e) {
@@ -17,7 +17,7 @@ export const useApiChatStore = create((set) => ({
 
   sendMessage: async (chatId, message) => {
     try {
-      const res = await fetch(`http://localhost:3000/chats/${chatId}/messages`, {
+      const res = await fetch(`https://api-digitalsymphony.ngrok.pizza/chats/${chatId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(message),

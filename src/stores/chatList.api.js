@@ -6,7 +6,7 @@ export const useApiChatListStore = create((set) => ({
 
   fetchLists: async () => {
     try {
-      const res = await fetch("http://localhost:3000/chat-lists");
+      const res = await fetch("https://api-digitalsymphony.ngrok.pizza/chat-lists");
       const data = await res.json();
       set({ chatLists: data });
     } catch (e) {
@@ -15,7 +15,7 @@ export const useApiChatListStore = create((set) => ({
   },
 
   addList: async (item) => {
-    const res = await fetch("http://localhost:3000/chat-lists", {
+    const res = await fetch("https://api-digitalsymphony.ngrok.pizza/chat-lists", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(item),
@@ -25,7 +25,7 @@ export const useApiChatListStore = create((set) => ({
   },
 
   updateList: async (id, updates) => {
-    await fetch(`http://localhost:3000/chat-lists/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/chat-lists/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
@@ -38,7 +38,7 @@ export const useApiChatListStore = create((set) => ({
   },
 
   deleteList: async (id) => {
-    await fetch(`http://localhost:3000/chat-lists/${id}`, {
+    await fetch(`https://api-digitalsymphony.ngrok.pizza/chat-lists/${id}`, {
       method: "DELETE",
     });
     set((s) => ({
