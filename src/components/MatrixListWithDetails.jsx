@@ -4,14 +4,14 @@ import { List, ListItem, ListItemButton, ListItemText, Typography, CircularProgr
 import axios from "axios";
 import { MatrixEditorView } from "./MatrixEditorView";
 
-export default function MatrixListWithDetails() {
+export default function MatrixListWithDetails({identifier}) {
   const [matrices, setMatrices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentItem, setCurrentItem] = useState(null);
 
   useEffect(() => {
     setLoading(true);
-    axios.get("https://api-digitalsymphony.ngrok.pizza/api/matrices")
+    axios.get(`https://api-digitalsymphony.ngrok.pizza/api/${identifier}`)
       .then(res => setMatrices(res.data))
       .finally(() => setLoading(false));
   }, []);
@@ -47,7 +47,7 @@ export default function MatrixListWithDetails() {
       }
       right={
         currentItem ? (
-          <MatrixEditorView matrixId={currentItem.id} />
+          <MatrixEditorView matrixId={currentItem.id} identifier={identifier} />
         ) : (
           <Box sx={{ p: 4, color: "text.secondary" }}>
             <Typography>Select a matrix to edit.</Typography>

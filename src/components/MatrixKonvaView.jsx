@@ -218,7 +218,7 @@ const addColX = x * (CELL_WIDTH + CELL_GAP) - CELL_GAP / 2;
     // -----
 
     layer.draw();
-  }, [matrix, onCellClick, onAddCol, onAddRow, onDeleteCell, onDeleteRow]);
+  }, [matrix]);
 
   return <KonvaView ref={konvaRef} width={width} height={height} onKeyDown={onKeyDown} />;
 }

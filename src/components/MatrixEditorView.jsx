@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useMatrixStore } from "../stores/matrixStore";
 import MatrixKonvaView from "./MatrixKonvaView";
 import { Box, Button, Dialog, TextField } from "@mui/material";
+import MatrixDOMView from "./MatrixDOMView";
 
 
-export function MatrixEditorView({ matrixId }) {
+export function MatrixEditorView({ matrixId, identifier = "matrices" }) {
   const {
     matrix,
     setMatrixId,
@@ -15,7 +16,7 @@ export function MatrixEditorView({ matrixId }) {
     addRowAt,
     deleteRowAt,
     deleteColAt
-  } = useMatrixStore();
+  } = useMatrixStore(identifier);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCell, setSelectedCell] = useState(null);
@@ -58,7 +59,7 @@ export function MatrixEditorView({ matrixId }) {
   return (
     <>
     <Button onClick={() => fetchMatrix(matrixId)}>Refresh</Button>
-      <MatrixKonvaView
+      <MatrixDOMView
         width={2000}
         height={2000}
         matrix={matrix}
