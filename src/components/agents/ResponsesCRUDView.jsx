@@ -18,7 +18,7 @@ export default function ResponsesCRUDDataTable() {
         valueKey: "id",
         labelKey: "text",
     },
-    { name: "request.timestamp", label: "Request Timestamp", editable: false },
+    { name: "request.timestamp", label: "Request Timestamp", type: "datetime", editable: false },
   ];
 
   const fetchItems = async () => {

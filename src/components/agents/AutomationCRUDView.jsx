@@ -1,42 +1,24 @@
 import CrudDataTable from "../CRUDDataTable";
 
 // SubgroupsCRUDDataTable.jsx
-const API_BASE = 'https://api-digitalsymphony.ngrok.pizza/api/requests';
+const API_BASE = 'https://api-digitalsymphony.ngrok.pizza/api/automations';
 
-export default function RequestsCRUDDataTable() {
+export default function AutomationCRUDDataTable() {
   const columns = [
     { name: "id", label: "ID", editable: false },
-    { name: "text", label: "Text", editable: true },
-    { name: "timestamp", label: "Timestamp", type: "datetime", required: true },
-    { name: "source.id", label: "Source ID", editable: false },
+    { name: "type", label: "Type", editable: true },
+    { name: "method", label: "Method", editable: true },
+    { name: "url", label: "URL", editable: true },
+    { name: "body", label: "Body", editable: true },
+    { name: "agent.id", label: "Agent ID", editable: false },
     {
-        tablePath: "source.agent.name",
-        formPath: "source",
-        label: "Source",
+        tablePath: "agent.name",
+        formPath: "agent",
+        label: "Agent",
         type: "entity",
         url: "https://api-digitalsymphony.ngrok.pizza/api/agents",
         valueKey: "id",
         labelKey: "name",
-    },
-    { name: "destination.id", label: "Destination ID", editable: false },
-    {
-        tablePath: "destination.agent.name",
-        formPath: "destination",
-        label: "Destination",
-        type: "entity",
-        url: "https://api-digitalsymphony.ngrok.pizza/api/agents",
-        valueKey: "id",
-        labelKey: "name",
-    },
-    { name: "interaction.id", label: "Interaction ID", editable: false },
-    {
-        tablePath: "interaction.uuid",
-        formPath: "interaction",
-        label: "Interaction",
-        type: "entity",
-        url: "https://api-digitalsymphony.ngrok.pizza/api/interactions",
-        valueKey: "id",
-        labelKey: "uuid",
     },
   ];
 
