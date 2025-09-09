@@ -1,9 +1,10 @@
+import { Button } from "@mui/material";
 import CrudDataTable from "../CRUDDataTable";
 
 // SubgroupsCRUDDataTable.jsx
 const API_BASE = 'https://api-digitalsymphony.ngrok.pizza/api/requests';
 
-export default function RequestsCRUDDataTable() {
+export default function RequestsCRUDDataTable({onView}) {
   const columns = [
     { name: "id", label: "ID", editable: false },
     { name: "text", label: "Text", editable: true },
@@ -28,16 +29,7 @@ export default function RequestsCRUDDataTable() {
         valueKey: "id",
         labelKey: "name",
     },
-    { name: "interaction.id", label: "Interaction ID", editable: false },
-    {
-        tablePath: "interaction.uuid",
-        formPath: "interaction",
-        label: "Interaction",
-        type: "entity",
-        url: "https://api-digitalsymphony.ngrok.pizza/api/interactions",
-        valueKey: "id",
-        labelKey: "uuid",
-    },
+    { name: "chainRequest.id", label: "Chain Request ID", editable: false },
   ];
 
   const fetchItems = async () => {
@@ -79,6 +71,15 @@ export default function RequestsCRUDDataTable() {
       onSave={onSave}
       onEdit={onEdit}
       onDelete={onDelete}
+      renderRowActions={(row) => (
+        <Button
+          size="small"
+          variant="text"
+          onClick={() => onView(row.id)}
+        >
+          View
+        </Button>
+      )}
     />
   );
 }

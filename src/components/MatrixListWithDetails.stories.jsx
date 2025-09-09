@@ -12,8 +12,8 @@ export const Default = {
   }
 };
 
-export const Agents = {
+export const Requests = {
   render() {
-    return <MatrixListWithDetails identifier="agentsMatrices"></MatrixListWithDetails>
+    return <MatrixListWithDetails identifier="requestsMatrices"></MatrixListWithDetails>
   }
 };

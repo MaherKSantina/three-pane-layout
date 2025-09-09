@@ -23,37 +23,11 @@ import { DateTime } from "luxon";
 import DataTableView from "./DataTable";
 import CrudDialogForm from "./CRUDDialogForm";
 
-// ------- tiny helpers reused here ---------
-const getAt2 = (obj, path, fallback = undefined) => {
-  if (!obj || !path) return fallback;
-  const parts = String(path).split(".");
-  let cur = obj;
-  for (const p of parts) {
-    if (cur == null) return fallback;
-    cur = cur[p];
-  }
-  return cur === undefined ? fallback : cur;
-};
-
-const cellToString2 = (val) => {
-  if (val == null) return "";
-  if (typeof val === "boolean") return val ? "true yes 1" : "false no 0";
-  if (val instanceof Date) return val.toISOString();
-  if (typeof val === "object") {
-    if (typeof val.label === "string") return val.label;
-    if (typeof val.name === "string") return val.name;
-    try { return JSON.stringify(val); } catch { return String(val); }
-  }
-  return String(val);
-};
-
-const renderLocalDateTime = (value) => {
-  if (!value) return "";
-  const dt = value instanceof Date ? DateTime.fromJSDate(value) : DateTime.fromISO(String(value));
-  if (!dt.isValid) return String(value);
-  return dt.toLocal().toFormat("yyyy-LL-dd HH:mm");
-};
-
+/**
+ * Props additions:
+ * @param {(row: any) => React.ReactNode} [renderRowActions] - Inject custom row actions.
+ * @param {boolean} [hideDefaultActions=false] - Hide the built-in Edit/Delete actions.
+ */
 export default function CrudDataTable({
   fetchItems,
   columns,
@@ -61,7 +35,40 @@ export default function CrudDataTable({
   onEdit,
   onDelete,
   idField = "id",
+  renderRowActions,         // NEW
+  hideDefaultActions = false, // NEW
 }) {
+  // ------- tiny helpers reused here ---------
+  const getAt2 = (obj, path, fallback = undefined) => {
+    if (!obj || !path) return fallback;
+    const parts = String(path).split(".");
+    let cur = obj;
+    for (const p of parts) {
+      if (cur == null) return fallback;
+      cur = cur[p];
+    }
+    return cur === undefined ? fallback : cur;
+  };
+
+  const cellToString2 = (val) => {
+    if (val == null) return "";
+    if (typeof val === "boolean") return val ? "true yes 1" : "false no 0";
+    if (val instanceof Date) return val.toISOString();
+    if (typeof val === "object") {
+      if (typeof val.label === "string") return val.label;
+      if (typeof val.name === "string") return val.name;
+      try { return JSON.stringify(val); } catch { return String(val); }
+    }
+    return String(val);
+  };
+
+  const renderLocalDateTime = (value) => {
+    if (!value) return "";
+    const dt = value instanceof Date ? DateTime.fromJSDate(value) : DateTime.fromISO(String(value));
+    if (!dt.isValid) return String(value);
+    return dt.toLocal().toFormat("yyyy-LL-dd HH:mm");
+  };
+
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -82,6 +89,7 @@ export default function CrudDataTable({
 
   useEffect(() => {
     loadItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAdd = () => { setFormValues({}); setMode("create"); setDialogOpen(true); };
@@ -113,22 +121,37 @@ export default function CrudDataTable({
     return items.filter((row) => rowSearchText(row).includes(q));
   }, [items, search, columns]);
 
-  const actionCol = {
-    name: "Actions",
-    cell: (row) => (
-      <Box>
+  const DefaultActionButtons = ({ row }) => {
+    if (hideDefaultActions) return null;
+    return (
+      <>
         <IconButton size="small" onClick={() => handleEditRow(row)}>
           <EditIcon fontSize="inherit" />
         </IconButton>
-        <IconButton size="small" color="error" onClick={() => setDeleteId(row[idField])}>
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => setDeleteId(row[idField])}
+        >
           <DeleteIcon fontSize="inherit" />
         </IconButton>
+      </>
+    );
+  };
+
+  const actionCol = {
+    name: "Actions",
+    cell: (row) => (
+      <Box display="flex" alignItems="center" gap={0.5}>
+        <DefaultActionButtons row={row} />
+        {/* Custom actions from parent */}
+        {typeof renderRowActions === "function" ? renderRowActions(row) : null}
       </Box>
     ),
     ignoreRowClick: true,
     allowOverflow: true,
     button: true,
-    width: "120px",
+    width: "auto",
   };
 
   const dtColumns = [
@@ -179,7 +202,8 @@ export default function CrudDataTable({
       }
       return {
         name: col.label,
-        selector: (row) => (col.selector && typeof col.selector === "function" ? col.selector(row) : getAt2(row, col.name)),
+        selector: (row) =>
+          col.selector && typeof col.selector === "function" ? col.selector(row) : getAt2(row, col.name),
         sortable: true,
         ...col.dataTableProps,
       };
@@ -251,7 +275,11 @@ export default function CrudDataTable({
         <DialogContent>Are you sure you want to delete this item?</DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteId(null)}>Cancel</Button>
-          <Button color="error" variant="contained" onClick={async () => { await onDelete(deleteId); setDeleteId(null); await loadItems(); }}>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={async () => { await onDelete(deleteId); setDeleteId(null); await loadItems(); }}
+          >
             Delete
           </Button>
         </DialogActions>
