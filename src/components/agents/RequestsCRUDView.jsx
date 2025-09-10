@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
 import CrudDataTable from "../CRUDDataTable";
+import axios from "axios";
 
 // SubgroupsCRUDDataTable.jsx
 const API_BASE = 'https://api-digitalsymphony.ngrok.pizza/api/requests';
@@ -39,13 +40,9 @@ export default function RequestsCRUDDataTable({onView}) {
   };
 
   const onSave = async (item) => {
-    const res = await fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(item)
-    });
-    if (!res.ok) throw new Error('Failed to add');
-    return await res.json();
+    const res = await axios.post(API_BASE, item);
+    console.log(res.data)
+    return res.data;
   };
 
   const onEdit = async (item) => {

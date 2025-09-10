@@ -9,6 +9,7 @@ const GAP = 8;
 const ADD = 22;
 
 const Cell = styled('div')(({ theme }) => ({
+  width: CELL_W, // lock cell width
   height: CELL_H,
   border: '1.5px solid #b0b4ba',
   borderRadius: 8,
@@ -73,55 +74,52 @@ export default function MatrixDOMView({
   );
 
   return (
-    <Box sx={{ p: 2 }}>
-      {/* Top rail: (corner spacer) + add/delete for each col */}
-      <Grid container spacing={2} sx={{ mb: 1 }}>
-        {/* corner spacer */}
-        <Grid size="auto">
-          <Box sx={{ width: CELL_W }} />
+    <Box sx={{ p: 2, width: '100%', minWidth: 0, overflow: 'auto' }}>
+      <Box sx={{ width: 'max-content' }}>
+        {/* Top rail: (corner spacer) + add/delete for each col */}
+        <Grid container spacing={2} sx={{ mb: 1 }}>
+          {/* corner spacer */}
+          <Grid size="auto">
+            <Box sx={{ width: CELL_W }} />
+          </Grid>
+
+          {Array.from({ length: maxCols + 1 }).map((_, colIndex) => (
+            <Grid key={`col-rail-${colIndex}`} size="auto">
+              <Box
+                sx={{
+                  width: CELL_W,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 0.5,
+                }}
+              >
+                {/* Only show delete if this is not the extra end slot */}
+                {colIndex < maxCols && (
+                  <DeletePill onClick={() => onDeleteCol(colIndex)}>
+                    {`Delete-${colIndex}`}
+                  </DeletePill>
+                )}
+                {/* Add before this column index (so last index adds at the end) */}
+                <AddDot onClick={() => onAddCol(colIndex)}>+</AddDot>
+              </Box>
+            </Grid>
+          ))}
         </Grid>
 
-        {Array.from({ length: maxCols + 1 }).map((_, colIndex) => (
-          <Grid key={`col-rail-${colIndex}`} size="auto">
-            <Box
-              sx={{
-                width: CELL_W,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 0.5,
-              }}
-            >
-              {/* Only show delete if this is not the extra end slot */}
-              {colIndex < maxCols && (
-                <DeletePill onClick={() => onDeleteCol(colIndex)}>
-                  {`Delete-${colIndex}`}
-                </DeletePill>
-              )}
-              {/* Add before this column index (so last index adds at the end) */}
-              <AddDot onClick={() => onAddCol(colIndex)}>+</AddDot>
-            </Box>
-          </Grid>
-        ))}
-      </Grid>
+        {/* Matrix rows */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: GAP }}>
+          {Array.from({ length: matrix.length + 1 }).map((_, rowIndex) => {
+            // The extra row at the bottom is only the controls, no cells
+            const isExtraRow = rowIndex >= matrix.length;
+            const row = matrix[rowIndex] || [];
 
-      {/* Matrix rows */}
-      <Grid container spacing={2}>
-        {Array.from({ length: matrix.length + 1 }).map((_, rowIndex) => {
-          // The extra row at the bottom is only the controls, no cells
-          const isExtraRow = rowIndex >= matrix.length;
-          const row = matrix[rowIndex] || [];
-
-          return (
-            <Grid
-              key={`row-${rowIndex}`}
-              container
-              spacing={2}
-              size={12}
-              alignItems="center"
-            >
-              {/* Left rail: delete row (except for last extra slot) + add */}
-              <Grid size="auto">
+            return (
+              <Box
+                key={`row-${rowIndex}`}
+                sx={{ display: 'flex', flexDirection: 'row', gap: GAP, alignItems: 'center', flexWrap: 'nowrap' }}
+              >
+                {/* Left rail: delete row (except for last extra slot) + add */}
                 <Box sx={{ width: CELL_W, display: 'flex', alignItems: 'center', gap: 1 }}>
                   {!isExtraRow && (
                     <DeletePill
@@ -133,15 +131,13 @@ export default function MatrixDOMView({
                   )}
                   <AddDot onClick={() => onAddRow(rowIndex)}>+</AddDot>
                 </Box>
-              </Grid>
 
-              {/* Render cells only if not the extra end row */}
-              {!isExtraRow &&
-                row.map((cell, colIndex) => {
-                  const Comp = cell && cell.text ? Filled : Cell;
-                  return (
-                    <Grid key={`cell-${colIndex}-${rowIndex}`} size="auto">
-                      <Box sx={{ width: CELL_W }}>
+                {/* Render cells only if not the extra end row */}
+                {!isExtraRow &&
+                  row.map((cell, colIndex) => {
+                    const Comp = cell && cell.text ? Filled : Cell;
+                    return (
+                      <Box key={`cell-${colIndex}-${rowIndex}`} sx={{ width: CELL_W }}>
                         <Comp onClick={() => onCellClick({ x: colIndex, y: rowIndex, cell })}>
                           {!!(cell && cell.text) && (
                             <>
@@ -152,8 +148,8 @@ export default function MatrixDOMView({
                                 overflowWrap: 'break-word',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                }}
-                                title={cell.text}>
+                              }}
+                              title={cell.text}>
                                 {cell.text}
                               </div>
                               {typeof cell.agent === 'string' && (
@@ -181,13 +177,13 @@ export default function MatrixDOMView({
                           </Kill>
                         </Comp>
                       </Box>
-                    </Grid>
-                  );
-                })}
-            </Grid>
-          );
-        })}
-      </Grid>
+                    );
+                  })}
+              </Box>
+            );
+          })}
+        </Box>
+      </Box>
     </Box>
   );
 }
