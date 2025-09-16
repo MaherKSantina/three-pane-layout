@@ -47,6 +47,7 @@ export default function CharacteristicsCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="characteristics-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

@@ -88,6 +88,7 @@ export default function StrategyContextsCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="strategy-contexts-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

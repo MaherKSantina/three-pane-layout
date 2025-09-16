@@ -33,6 +33,23 @@ export default function RequestsCRUDDataTable({onView}) {
     { name: "chainRequest.id", label: "Chain Request ID", editable: false },
   ];
 
+  const filters = {
+  schema: [
+    { key: "text", label: "Text contains", type: "text", path: "text" },
+    { key: "source", label: "Source", type: "entity", path: "source.agent.id", url: "https://api-digitalsymphony.ngrok.pizza/api/agents", valueKey: "id", labelKey: "name", searchParam: "q" },
+    { key: "destination", label: "Destination", type: "entity", path: "destination.agent.id", url: "https://api-digitalsymphony.ngrok.pizza/api/agents", valueKey: "id", labelKey: "name", searchParam: "q" },
+    { key: "isRoot", label: "Is ROOT", type: "boolean", path: "chainRequest.id" },
+    { key: "time", label: "Timestamp", type: "datetimeRange", path: "timestamp" },
+  ],
+  // optional: custom predicate if you want to override default AND logic
+  predicate: (row, active) => { 
+    if(active.isRoot) {
+      return row.chainRequest.id === row.id
+    }
+    return true
+   },
+};
+
   const fetchItems = async () => {
     const res = await fetch(API_BASE);
     if (!res.ok) throw new Error('Failed to fetch subgroups');
@@ -63,11 +80,13 @@ export default function RequestsCRUDDataTable({onView}) {
 
   return (
     <CrudDataTable
+      storageKey="requests-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}
       onEdit={onEdit}
       onDelete={onDelete}
+      filters={filters}
       renderRowActions={(row) => (
         <Button
           size="small"

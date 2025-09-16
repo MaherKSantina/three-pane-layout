@@ -56,6 +56,7 @@ export default function AutomationCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="automations-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

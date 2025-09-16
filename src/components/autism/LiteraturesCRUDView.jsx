@@ -45,6 +45,7 @@ export default function LiteraturesCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="literatures-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

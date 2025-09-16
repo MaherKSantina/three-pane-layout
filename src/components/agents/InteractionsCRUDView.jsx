@@ -42,6 +42,7 @@ export default function AgentsCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="interactions-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

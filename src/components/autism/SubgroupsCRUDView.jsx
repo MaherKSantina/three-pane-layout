@@ -44,6 +44,7 @@ export default function SubgroupsCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="subgroups-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

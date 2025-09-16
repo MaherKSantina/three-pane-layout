@@ -65,6 +65,7 @@ export default function StrategiesCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="strategies-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

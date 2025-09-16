@@ -67,6 +67,7 @@ export default function TransitionsCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="transitions-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

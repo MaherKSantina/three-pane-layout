@@ -55,6 +55,7 @@ export default function ResponsesCRUDDataTable() {
 
   return (
     <CrudDataTable
+    storageKey="responses-crud-table"
       fetchItems={fetchItems}
       columns={columns}
       onSave={onSave}

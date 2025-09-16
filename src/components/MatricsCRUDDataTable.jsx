@@ -48,6 +48,7 @@ export default function MatricsCRUDDataTable() {
 
     return (
       <CrudDataTable
+      storageKey="matrices-crud-table"
         fetchItems={fetchItems}
         columns={columns}
         onSave={onSave}

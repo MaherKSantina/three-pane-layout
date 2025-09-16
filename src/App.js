@@ -13,6 +13,7 @@ import MatrixListWithDetails from './components/MatrixListWithDetails';
 import MatricsCRUDDataTable from './components/MatricsCRUDDataTable';
 import RequestsCRUDDataTable from './components/agents/RequestsCRUDView';
 import { useNavigate } from "react-router-dom";
+import MissileSimView from './components/sim/MissileSim';
 
 function RequestsPage() {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ function App() {
       <Route path="/requests/:id/matrix" element={<RequestMatrixPage />} />
       <Route path="/matricesDetails" element={<MatrixListWithDetails></MatrixListWithDetails>} />
       <Route path="/matrices" element={<MatricsCRUDDataTable></MatricsCRUDDataTable>} />
+      <Route path="/sim" element={<MissileSimView></MissileSimView>} />
       
       </Routes>
       

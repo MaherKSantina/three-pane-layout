@@ -25,6 +25,7 @@ export const Default = {
 
       return (
         <CrudDataTable
+        storageKey="example-crud-table"
           fetchItems={fetchItems}
           columns={columns}
           onSave={onSave}
