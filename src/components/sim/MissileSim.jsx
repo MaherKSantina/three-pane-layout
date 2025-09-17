@@ -80,6 +80,7 @@ function useSimSocket(latestFrameRef) {
  * REST helpers (Express endpoints)
  ************************************/
 async function postJSON(url, body) {
+  console.log(body)
     const r = await axios.post(url, body);
     return r.data
 }
@@ -95,6 +96,23 @@ function ControlsPanel() {
   const lastError   = useSimStore(s => s.lastError);
 
   const busyRef = useRef(false);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  })
+  const handleKeyDown = async (event) => {
+    if (event.key === 'r') {
+      // Handle down arrow key press
+      await onReset()
+      await onStart()
+    } else {
+      await onFunction("push", {pos: event.key})
+    }
+  }
 
   const onScenario = async () => {
     try {
@@ -129,6 +147,14 @@ function ControlsPanel() {
       await postJSON(`${apiUrl}/reset`);
     } catch (e) {
       alert(`Reset error: ${e.message}`);
+    }
+  };
+
+  const onFunction = async (op, body) => {
+    try {
+      await postJSON(`${apiUrl}/${op}`, body);
+    } catch (e) {
+      alert(`Push error: ${e.message}`);
     }
   };
 
@@ -172,6 +198,15 @@ function ControlsPanel() {
         </button>
         <button className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm" onClick={onReset}>
           Reset
+        </button>
+        <button className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm" onClick={() => onFunction("push", {pos: 1})}>
+          Bottom
+        </button>
+        <button className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm" onClick={() => onFunction("push", {pos: 2})}>
+          Right
+        </button>
+        <button className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm" onClick={() => onFunction("push", {pos: 3})}>
+          Left
         </button>
       </div>
 
