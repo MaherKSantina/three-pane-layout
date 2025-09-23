@@ -11,8 +11,8 @@ import MissileModel from "./MissileModel";
  * Zustand store for UI + topology
  ************************************/
 const useSimStore = create((set) => ({
-  apiUrl: "http://localhost:3000/api/scenario",   // for REST
-  wsUrl:  "http://localhost:3000",   // for Socket.IO (no /api)
+  apiUrl: "http://localhost:3400/api/scenario",   // for REST
+  wsUrl:  "http://localhost:3400",   // for Socket.IO (no /api)
   connected: false,
   connecting: false,
   lastError: null,
@@ -179,13 +179,13 @@ function ControlsPanel() {
           className="border rounded px-2 py-1 text-sm flex-1"
           value={apiUrl}
           onChange={(e) => setApiUrl(e.target.value)}
-          placeholder="http://localhost:3000"
+          placeholder="http://localhost:3400"
         />
         <input
           className="border rounded px-2 py-1 text-sm flex-1"
           value={wsUrl}
           onChange={(e) => setWsUrl(e.target.value)}
-          placeholder="http://localhost:3000"
+          placeholder="http://localhost:3400"
         />
         <button className="px-3 py-1.5 rounded bg-blue-600 text-white text-sm" onClick={onScenario}>
           Create/Update Scenario
@@ -207,6 +207,11 @@ function ControlsPanel() {
         </button>
         <button className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm" onClick={() => onFunction("push", {pos: 3})}>
           Left
+        </button>
+        <button className="px-3 py-1.5 rounded bg-slate-700 text-white text-sm" onClick={async () => {
+            await axios.post("https://api-digitalsymphony.ngrok.pizza/api/requests", {"text":" ","source":{"id":"4"},"destination":{"id":"14"},"timestamp": new Date(Date.now())})
+        }}>
+          Agent
         </button>
       </div>
 
