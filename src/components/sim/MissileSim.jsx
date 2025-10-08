@@ -6,6 +6,7 @@ import { create } from "zustand";
 import { shallow } from "zustand/shallow";
 import axios from "axios";
 import MissileModel from "./MissileModel";
+import MidiLogger from "./MidiLogger";
 
 /************************************
  * Zustand store for UI + topology
@@ -96,6 +97,11 @@ function ControlsPanel() {
   const lastError   = useSimStore(s => s.lastError);
 
   const busyRef = useRef(false);
+  const [pitch, setPitch] = useState(null)
+  const prevPitchRef = useRef(null);
+
+  const [vel, setVel] = useState(null)
+  const prevVelRef = useRef(null);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -104,6 +110,29 @@ function ControlsPanel() {
       document.removeEventListener('keydown', handleKeyDown);
     };
   })
+
+  useEffect(() => {
+      if (pitch === null) return;                // not set yet
+      const prev = prevPitchRef.current ?? pitch;     // first event → delta 0
+      const delta = pitch - prev;
+      if(delta > 0) {
+        handleKeyDown({key: 'w'})
+      } else if(delta < 0) {
+        handleKeyDown({key: 's'})
+      }
+      prevPitchRef.current = pitch;                   // update prev AFTER reading
+  }, [pitch])
+
+  useEffect(() => {
+    
+      if (vel === null) return;                // not set yet
+      const prev = prevVelRef.current ?? vel;     // first event → delta 0
+      const delta = vel - prev;
+      if(delta > 0) {
+        handleKeyDown({key: 'i'})
+      }
+      prevVelRef.current = vel;                   // update prev AFTER reading
+  }, [vel])
   const handleKeyDown = async (event) => {
     if (event.key === 'r') {
       // Handle down arrow key press
@@ -213,6 +242,25 @@ function ControlsPanel() {
         }}>
           Agent
         </button>
+        <MidiLogger onChange={({status, data1, data2}) => {
+          console.log("MIDI", status, data1, data2)
+          if(status === 178) {
+            if(data1 === 21) {
+              // let diff = lastValues[21] - data2
+              // console.log(diff)
+              // if(diff < 0) {
+              //   console.log("W")
+              //   handleKeyDown({key: 'w'})
+              // } else if(diff > 0) {
+              //   handleKeyDown({key: 's'})
+              // }
+              setPitch(data2)
+            } else if(data1 === 22) {
+              
+              setVel(data2)
+            }
+          }
+        }} />
       </div>
 
       {lastError && (
