@@ -1,5 +1,5 @@
 // ChatWindow.jsx
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   Paper,
   TextField,
@@ -26,14 +26,13 @@ import GenericDataTable from "../GenericDataTable";
 const RESIZE_IDLE_MS = 200; // fire after user stops dragging for this long
 const MAX_LINES = 20;
 
-export default function ChatWindow({ messages, sendMode = "text", onSendMessage, onRefresh, onMessageOptions, shouldFocus = true }) {
-  const [input, setInput] = useState("");
+export default function ChatWindow({ input, messages, sendMode = "text", onSendMessage, onChange, onRefresh, onMessageOptions, shouldFocus = true }) {
   const inputRef = useRef(null);
-  useEffect(() => {
-    if (sendMode === 'text' && inputRef.current && shouldFocus) {
-      inputRef.current.focus();
-    }
-  }, [messages, sendMode, shouldFocus]);
+  // useEffect(() => {
+  //   if (sendMode === 'text' && inputRef.current && shouldFocus) {
+  //     inputRef.current.focus();
+  //   }
+  // }, [messages, sendMode, shouldFocus]);
   const listRef = useRef(null);
   const containerRef = useRef(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
@@ -120,9 +119,7 @@ export default function ChatWindow({ messages, sendMode = "text", onSendMessage,
     if (sendMode === "text") {
       const text = input.trim();
       if (!text) return;
-      const msg = { type: "text", text, isResponse };
-      const success = await onSendMessage(msg);
-      if (success) setInput("");
+      onSendMessage();
     } else {
       const msg = { type: "buttonClick", button };
       await onSendMessage(msg);
@@ -169,7 +166,7 @@ export default function ChatWindow({ messages, sendMode = "text", onSendMessage,
   // Keep input synchronized if user edits in Compose viewer
   const handleViewerChange = (newValue) => {
     setViewerContent(newValue);
-    if (!viewerReadOnly) setInput(newValue);
+    if (!viewerReadOnly) onChange(newValue);
   };
 
   // Open a message as a data table dialog
@@ -201,6 +198,13 @@ export default function ChatWindow({ messages, sendMode = "text", onSendMessage,
     setMenuMessage(null);
     setMenuIndex(null)
   };
+
+  const handleChange = useCallback(
+    (event) => {
+      onChange(event.target.value);
+    },
+    [onChange],
+  );
 
   return (
     <>
@@ -352,6 +356,14 @@ export default function ChatWindow({ messages, sendMode = "text", onSendMessage,
           </MenuItem>
           <MenuItem
             onClick={() => {
+              if (menuIndex != null) onMessageOptions?.("select", menuIndex);
+              handleMenuClose();
+            }}
+          >
+            Select
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
               if (menuIndex != null) onMessageOptions?.("restart", menuIndex);
               handleMenuClose();
             }}
@@ -365,6 +377,14 @@ export default function ChatWindow({ messages, sendMode = "text", onSendMessage,
             }}
           >
             Edit
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              if (menuIndex != null) onMessageOptions?.("delete", menuIndex);
+              handleMenuClose();
+            }}
+          >
+            Delete
           </MenuItem>
         </Menu>
 
@@ -391,9 +411,8 @@ export default function ChatWindow({ messages, sendMode = "text", onSendMessage,
                 size="small"
                 placeholder="Type a message…"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={handleChange}
                 onKeyDown={handleKey}
-                inputRef={inputRef}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import MonacoViewer from '../MonacoViewer';
 import ChattableComponent from './ChattableComponent';
 import axios from 'axios';
@@ -10,8 +10,11 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import Calendar from '../Calendar2';
-import { useParams } from 'react-router-dom';
+import GanttChart from '../GanttChart';
+import { ParentSize } from './ParentSize';
 
 export default function APIChattableComponent() {
   const [layout, setLayout] = useState(null);
@@ -21,39 +24,49 @@ export default function APIChattableComponent() {
   const [editOpen, setEditOpen] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   const [editText, setEditText] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(null)
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState("")
+
+  const handleTextChange = useCallback((next) => {
+    setMessage(next);
+  }, []);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   async function sendMessage(msg, messagesForRequest, layoutForRequest) {
-    const response = await axios.post(
-      `https://api-digitalsymphony.ngrok.pizza/focus/sendMessage`,
-      {
-        previousMessages: messagesForRequest,
-        previousLayout: layoutForRequest,
-        message: {
-          ...msg,
-          timestamp: Date.now(),
-        },
-      }
-    );
-    setLayout(response.data.layout);
-    setMessages(response.data.messages);
-    return true;
-  }
-
-  function CalendarPage() {
-    const [data, setData] = useState([])
-  
-    useEffect(() => {
-        reloadData()
-      }, [])
-  
-    async function reloadData() {
-        let response = await axios.get(`https://api-digitalsymphony.ngrok.pizza/data/current/calendar`)
-        setData(response.data)
-      }
-  
-    return (
-      <Calendar events={data} slotDuration={"00:10:00"}></Calendar>
-    );
+    if(selectedIndex != null) {
+        let newMessages = [...messages]
+        newMessages.splice(selectedIndex + 1, 0, msg)
+        setMessages(newMessages)
+    } else {
+        try {
+        const response = await axios.post(
+        `https://api-digitalsymphony.ngrok.pizza/focus/sendMessage`,
+        {
+            previousMessages: messagesForRequest,
+            previousLayout: layoutForRequest,
+            message: {
+            ...msg,
+            timestamp: Date.now(),
+            },
+        }
+        );
+        setLayout(response.data.layout);
+        setMessages(response.data.messages);
+    } catch(error) {
+        setError(error)
+        setOpen(true)
+        setMessage(msg.text)
+    }
+    }
   }
 
   function getComponent() {
@@ -61,7 +74,19 @@ export default function APIChattableComponent() {
       if (layout.type === "monaco") {
         return <MonacoViewer value={layout.text} readOnly />;
       } else if(layout.type === "calendar") {
-        return <CalendarPage></CalendarPage>
+        return <ParentSize>
+            {({width, height}) => {
+                return <Calendar events={layout.data} slotDuration={"00:10:00"} style={{width, height}}></Calendar>
+            }}
+        </ParentSize>
+        
+      } else if(layout.type === "gantt") {
+        const {tasks, links} = layout.data
+        return <ParentSize>
+            {({width, height}) => (
+                <GanttChart tasks={tasks} links={links} height={height}></GanttChart>
+            )}
+        </ParentSize>
       }
     }
     return null;
@@ -101,17 +126,28 @@ export default function APIChattableComponent() {
 
   return (
     <>
+    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {JSON.stringify(error, null, 2)}
+        </Alert>
+      </Snackbar>
       <ChattableComponent
         messages={messages}
-        onSendMessage={(msg) => {
-          sendMessage(msg, messages, layout);
+        input={message}
+        onChange={handleTextChange}
+        onSendMessage={() => {
+            let m = message
+            setMessage("")
+          sendMessage({type: "text", text: m, isResponse: true}, messages, layout);
         }}
         sendMode="text"
         component={getComponent()}
-        onRefresh={() => {
-          setLayout(null);
-          setMessages([]);
-        }}
+        onRefresh={() => {}}
         onMessageOptions={async (option, index) => {
           if (option === "restart") {
             const shouldExecute = { ...messages[index] };
@@ -131,6 +167,16 @@ export default function APIChattableComponent() {
             setMessages(copy);
           } else if (option === "edit") {
             handleOpenEdit(index);
+          } else if(option === "delete") {
+            let newMessages = [...messages]
+            newMessages.splice(index, 1)
+            setMessages(newMessages)
+          } else if(option === "select") {
+            if(index === messages.length - 1) {
+                setSelectedIndex(null)
+            } else {
+                setSelectedIndex(index)
+            }
           }
         }}
         shouldFocus={!editOpen}

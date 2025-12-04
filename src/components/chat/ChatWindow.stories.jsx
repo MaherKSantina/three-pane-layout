@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import ChatWindow from './ChatWindow';
 import { ChatContext, StoreContext } from '../../contexts/StoreContext';
 import { useLocalChatStore } from '../../stores/chat.local';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 
 const meta = {
@@ -12,14 +12,20 @@ const meta = {
 
 export default meta;
 
-export const Text = {
-  render() {
-    return (
-      <ChatWindow messages={[]} sendMode='text' onSendMessage={(msg) => {
-        console.log(msg)
-        return true
+function CW() {
+  const [message, setMessage] = useState("")
+  const handleTextChange = useCallback((next) => {
+      setMessage(next);
+    }, []);
+return (
+      <ChatWindow input={message} onChange={handleTextChange} messages={[{type: "text", text: "halaa", isResponse: true}]} sendMode='text' onSendMessage={() => {
       }}></ChatWindow>
     )
+}
+
+export const Text = {
+  render() {
+    return <CW></CW>
   }
 };
 

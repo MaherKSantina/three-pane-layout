@@ -29,50 +29,50 @@ const GanttChart = ({
   const [selectedParentId, setSelectedParentId] = useState(null);
 
   // --- Intercept DHTMLX events for + and edit ---
-  useEffect(() => {
-    // Prevent default add dialog
-    gantt.attachEvent("onTaskCreated", () => false);
+  // useEffect(() => {
+  //   // Prevent default add dialog
+  //   gantt.attachEvent("onTaskCreated", () => false);
 
-    // "+" on grid row: open form as create child
-    const gridRowClickId = gantt.attachEvent("onTaskClick", function (id, e) {
-      if (e.target && e.target.classList.contains("gantt_add")) {
-        setSelectedParentId(id);
-        setSelectedTaskId(null);
-        setFormOpen(true);
-        return false; // prevent default add
-      }
+  //   // "+" on grid row: open form as create child
+  //   const gridRowClickId = gantt.attachEvent("onTaskClick", function (id, e) {
+  //     if (e.target && e.target.classList.contains("gantt_add")) {
+  //       setSelectedParentId(id);
+  //       setSelectedTaskId(null);
+  //       setFormOpen(true);
+  //       return false; // prevent default add
+  //     }
 
-      if (e.target.classList.contains("gantt-btn-delete")) {
-        if (window.confirm("Are you sure you want to delete this task?")) {
-          // Remove from gantt view
-          gantt.deleteTask(id);
-          // Let parent handle API / state
-          if (onDeleteTask) {
-            onDeleteTask(id);
-          }
-        }
-        return false;
-      }
+  //     if (e.target.classList.contains("gantt-btn-delete")) {
+  //       if (window.confirm("Are you sure you want to delete this task?")) {
+  //         // Remove from gantt view
+  //         gantt.deleteTask(id);
+  //         // Let parent handle API / state
+  //         if (onDeleteTask) {
+  //           onDeleteTask(id);
+  //         }
+  //       }
+  //       return false;
+  //     }
 
-      return true;
-    });
+  //     return true;
+  //   });
 
-    // Double-click task: open edit form
-    const dblClickId = gantt.attachEvent("onTaskDblClick", function (id) {
-      const task = tasks.find((t) => String(t.id) === String(id));
-      if (task) {
-        setSelectedTaskId(task.id);
-        setSelectedParentId(task.parent || null);
-        setFormOpen(true);
-      }
-      return false; // prevent default editor
-    });
+  //   // Double-click task: open edit form
+  //   const dblClickId = gantt.attachEvent("onTaskDblClick", function (id) {
+  //     const task = tasks.find((t) => String(t.id) === String(id));
+  //     if (task) {
+  //       setSelectedTaskId(task.id);
+  //       setSelectedParentId(task.parent || null);
+  //       setFormOpen(true);
+  //     }
+  //     return false; // prevent default editor
+  //   });
 
-    return () => {
-      gantt.detachEvent(gridRowClickId);
-      gantt.detachEvent(dblClickId);
-    };
-  }, [tasks, onDeleteTask]);
+  //   return () => {
+  //     gantt.detachEvent(gridRowClickId);
+  //     gantt.detachEvent(dblClickId);
+  //   };
+  // }, [tasks, onDeleteTask]);
 
   // Attach handlers (CRUD-ish hooks)
   useEffect(() => {
@@ -283,4 +283,13 @@ const GanttChart = ({
   );
 };
 
-export default GanttChart;
+function areEqual(prevProps, nextProps) {
+  // Only care about these
+  const sameTasks = prevProps.tasks === nextProps.tasks;
+  const sameLinks = prevProps.links === nextProps.links;
+  const sameExpanded = prevProps.expandedTaskIds === nextProps.expandedTaskIds;
+
+  return sameTasks && sameLinks && sameExpanded;
+}
+
+export default React.memo(GanttChart, areEqual);
