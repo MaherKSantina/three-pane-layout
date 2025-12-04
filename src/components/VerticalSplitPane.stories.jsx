@@ -6,7 +6,7 @@ import KanbanBoard from './KanbanBoard';
 import ProcessFlow from './ProcessFlow';
 import SplitPane from './SplitPane';
 import { useLocalChatStore } from '../stores/chat.local';
-import ChatWindow from './ChatWindow';
+import ChatWindow from './chat/ChatWindow';
 
 const meta = {
   component: VerticalSplitPane,

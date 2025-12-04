@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import ChatWindow from './ChatWindow';
-import { ChatContext, StoreContext } from '../contexts/StoreContext';
-import { useLocalChatStore } from '../stores/chat.local';
+import { ChatContext, StoreContext } from '../../contexts/StoreContext';
+import { useLocalChatStore } from '../../stores/chat.local';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
@@ -76,23 +76,27 @@ export const StressTest = {
   }
 };
 
-function APIChatMessage({sourceAgentID, channelID}) {
+export function APIChatMessage({sourceAgentID, channelID, isRequest = false}) {
 
   const [messages, setMessages] = useState([])
   const [layout, setLayout] = useState("text")
 
   useEffect(() => {
     reloadData()
-  }, [])
+  }, [sourceAgentID, channelID])
+
+  function messagesPath() {
+    return isRequest ? "requests" : "channel"
+  }
 
   async function reloadData() {
-    let response = await axios.post(`http://localhost:3000/api/channel/${channelID}/messages`, {sourceAgentID})
+    let response = await axios.post(`https://api-digitalsymphony.ngrok.pizza/api/${messagesPath()}/${channelID}/messages`, {sourceAgentID})
     setMessages(response.data.messages)
     setLayout(response.data.layout)
   }
 
   async function addMessage(msg) {
-    await axios.post(`http://localhost:3000/api/channel/${channelID}/createMessage`, {sourceAgentID, data: msg})
+    await axios.post(`https://api-digitalsymphony.ngrok.pizza/api/${messagesPath()}/${channelID}/createMessage`, {sourceAgentID, data: msg, isResponse: msg.isResponse})
     await reloadData()
     return true
   }

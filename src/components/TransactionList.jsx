@@ -18,10 +18,10 @@ useEffect(() => {
     return
   }
   setFilteredData(transactions.filter(item =>
-    item.description.toLowerCase().includes(search.toLowerCase()) ||
-    item.date.includes(search.toLowerCase()) ||
-    item.group.includes(search.toLowerCase()) ||
-    item.amount.includes(search.toLowerCase())
+    item.description?.toLowerCase().includes(search.toLowerCase()) ||
+    item.date?.includes(search.toLowerCase()) ||
+    item.group?.includes(search.toLowerCase()) ||
+    item.amount?.includes(search.toLowerCase())
   ))
 },[transactions, search])
 

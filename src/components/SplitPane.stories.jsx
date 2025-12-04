@@ -1,7 +1,7 @@
 import { TextField } from '@mui/material';
 import SplitPane from './SplitPane';
-import ChatWindow from './ChatWindow';
-import ChatList from './ChatList';
+import ChatWindow from './chat/ChatWindow';
+import ChatList from './chat/ChatList';
 import { StoreContext } from '../contexts/StoreContext';
 import { useLocalChatListStore } from '../stores/chatList.local';
 import { useLocalChatStore } from '../stores/chat.local';

@@ -22,18 +22,19 @@ function tryPrettyJson(input) {
   }
 }
 
-export default function MonacoViewer({ value }) {
+export default function MonacoViewer({ value, readOnly = true, onChange }) {
   const { text, language } = React.useMemo(() => tryPrettyJson(value), [value]);
 
   return (
     <Box sx={{ height: '100%', display: 'grid', size: 'grow' }}>
       <Editor
         height="100%"
+        onChange={onChange}
         language={language === 'plaintext' ? 'yaml' : language /* default to yaml-style for non-JSON */}
         value={text}
         theme="vs-dark"
         options={{
-          readOnly: true,
+          readOnly: readOnly,
           fontSize: 14,
           minimap: { enabled: false },
           automaticLayout: true,

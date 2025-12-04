@@ -4,7 +4,7 @@ import { useLocalFlowStore } from '../stores/flow.local';
 import { useGanttLocalStore } from '../stores/gantt.local';
 import { useLocalKanbanStore } from '../stores/kanban.local';
 import { useLocalTimelineStore } from '../stores/timeline.local';
-import ChatWindow from './ChatWindow';
+import ChatWindow from './chat/ChatWindow';
 import KanbanBoard from './KanbanBoard';
 import ProcessFlow from './ProcessFlow';
 import GanttChart from './GanttChart';

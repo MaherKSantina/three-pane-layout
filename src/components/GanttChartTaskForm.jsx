@@ -31,13 +31,14 @@ export function TaskForm({
   onClose,
   onSubmit,
   taskId,
+  text,
   getTask,
   parentTasks = [],
   editing,
   parent = null
 }) {
   const [values, setValues] = useState({
-    text: "",
+    text: text,
     start_date: "",
     end_date: "",
     duration: "",
@@ -46,19 +47,19 @@ export function TaskForm({
   });
 
   async function hydrateTask() {
-    let task = await getTask(taskId)
-    setValues({
-        text: task?.text || "",
-        start_date: task?.start_date
-          ? toLuxon(task.start_date).toFormat("yyyy-MM-dd'T'HH:mm")
-          : "",
-        end_date: task?.end_date
-          ? toLuxon(task.end_date).toFormat("yyyy-MM-dd'T'HH:mm")
-          : "",
-        duration: task?.duration ?? "",
-        progress: task?.progress ?? 0,
-        parent: task?.parent ?? null,
-      });
+    // let task = await getTask(taskId)
+    // setValues({
+    //     text: task?.text || "",
+    //     start_date: task?.start_date
+    //       ? toLuxon(task.start_date).toFormat("yyyy-MM-dd'T'HH:mm")
+    //       : "",
+    //     end_date: task?.end_date
+    //       ? toLuxon(task.end_date).toFormat("yyyy-MM-dd'T'HH:mm")
+    //       : "",
+    //     duration: task?.duration ?? "",
+    //     progress: task?.progress ?? 0,
+    //     parent: task?.parent ?? null,
+    //   });
   }
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export function TaskForm({
       hydrateTask(taskId)
     } else {
         setValues({
+            text,
             parent
         })
     }

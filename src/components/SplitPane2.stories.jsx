@@ -1,7 +1,7 @@
 import { ChatContext, StoreContext } from '../contexts/StoreContext';
 import { useLocalChatStore } from '../stores/chat.local';
 import { useLocalKanbanStore } from '../stores/kanban.local';
-import ChatWindow from './ChatWindow';
+import ChatWindow from './chat/ChatWindow';
 import KanbanBoard from './KanbanBoard';
 import SplitPane from './SplitPane2';
 import VerticalSplitPane from './VerticalSplitPane2';

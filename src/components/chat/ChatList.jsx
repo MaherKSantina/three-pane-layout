@@ -14,16 +14,11 @@ import {
 import EditRounded from "@mui/icons-material/EditRounded";
 import DeleteRounded from "@mui/icons-material/DeleteRounded";
 import ChatListDialog from "./ChatListDialog";
-import { useStore } from "../contexts/StoreContext";
+import { useStore } from "../../contexts/StoreContext";
 
-export default function ChatList() {
-  const { chatLists, fetchLists, addList, updateList, deleteList } = useStore();
+export default function ChatList({agents, chats, onAdd, onDelete, onClick}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editData, setEditData] = useState(null);
-
-  useEffect(() => {
-    fetchLists();
-  }, []);
 
   const handleAdd = () => {
     setEditData(null);
@@ -35,13 +30,12 @@ export default function ChatList() {
     setDialogOpen(true);
   };
 
-  const handleDelete = (id) => {
-    deleteList(id);
+  const handleDelete = (data) => {
+    onDelete?.(data)
   };
 
   const handleSave = (data) => {
-    if (data.id) updateList(data.id, data);
-    else addList(data);
+    onAdd?.(data)
   };
 
   return (
@@ -55,18 +49,15 @@ export default function ChatList() {
 
       <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
         <List disablePadding>
-          {chatLists.map((chat) => (
+          {chats.map((chat) => (
             <React.Fragment key={chat.id}>
-              <ListItemButton onClick={() => console.log("select", chat.id)}>
+              <ListItemButton onClick={() => onClick?.(chat)}>
                 <ListItemText
-                  primary={chat.interactor}
-                  secondary={chat.subject}
+                  primary={chat.title}
+                  secondary={chat.subtitle}
                 />
                 <ListItemSecondaryAction>
-                  <IconButton edge="end" onClick={() => handleEdit(chat)}>
-                    <EditRounded />
-                  </IconButton>
-                  <IconButton edge="end" onClick={() => handleDelete(chat.id)}>
+                  <IconButton edge="end" onClick={() => onDelete?.(chat)}>
                     <DeleteRounded />
                   </IconButton>
                 </ListItemSecondaryAction>
@@ -78,8 +69,8 @@ export default function ChatList() {
       </Box>
 
       <ChatListDialog
+      agents={agents}
         open={dialogOpen}
-        initialData={editData}
         onClose={() => setDialogOpen(false)}
         onSave={handleSave}
       />

@@ -2,7 +2,7 @@ import { Box, TextField } from "@mui/material";
 import { ChatContext, KanbanContext, StoreContext, TimelineContext } from "../contexts/StoreContext";
 import { useLocalChatStore } from "../stores/chat.local";
 import { useLocalKanbanStore } from "../stores/kanban.local";
-import ChatWindow from "./ChatWindow";
+import ChatWindow from "./chat/ChatWindow";
 import KanbanBoard from "./KanbanBoard";
 import ProcessFlow from "./ProcessFlow";
 import SplitPane from "./SplitPane2";
