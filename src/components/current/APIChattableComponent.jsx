@@ -15,6 +15,7 @@ import Alert from '@mui/material/Alert';
 import Calendar from '../Calendar2';
 import GanttChart from '../GanttChart';
 import { ParentSize } from './ParentSize';
+import MarkdownView from './MarkdownView';
 
 export default function APIChattableComponent() {
   const [layout, setLayout] = useState(null);
@@ -87,6 +88,8 @@ export default function APIChattableComponent() {
                 <GanttChart tasks={tasks} links={links} height={height}></GanttChart>
             )}
         </ParentSize>
+      } else if(layout.type === "markdown") {
+        return <MarkdownView text={layout.text}></MarkdownView>
       }
     }
     return null;
