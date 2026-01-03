@@ -14,12 +14,17 @@ import MatricsCRUDDataTable from './components/MatricsCRUDDataTable';
 import RequestsCRUDDataTable from './components/agents/RequestsCRUDView';
 import { useNavigate } from "react-router-dom";
 import MissileSimView from './components/sim/MissileSim';
-import { APIChatMessage } from './components/chat/ChatWindow.stories';
 import ChatListWithDetails from './components/chat/ChatListWithDetails';
 import GanttChart from './components/GanttChart';
 import { cloneElement, isValidElement, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import APIChattableComponent from './components/current/APIChattableComponent';
+import APIChatWindow from './components/chat/APIChatWindow';
+import Remarkable from './components/current/remarkable';
+import FlatItemsTableView from './components/current/FlatItemsTableView';
+import FlatItemsTableAPIView from './components/current/FlatItemsTableAPIView';
+import APIScheduleList from './components/current/APIScheduleList';
+import APIRecipe from './components/current/APIRecipe';
 
 const RESIZE_IDLE_MS = 150;
 
@@ -143,14 +148,14 @@ function RequestMatrixPage() {
 function ChatMessagePage() {
   const { id } = useParams();
   return (
-    <APIChatMessage sourceAgentID={4} channelID={id}></APIChatMessage>
+    <APIChatWindow sourceAgentID={4} channelID={id}></APIChatWindow>
   );
 }
 
 function RequestsAsChatPage() {
   const { id } = useParams();
   return (
-    <APIChatMessage isRequest={true} sourceAgentID={4} channelID={id}></APIChatMessage>
+    <APIChatWindow isRequest={true} sourceAgentID={4} channelID={id}></APIChatWindow>
   );
 }
 
@@ -190,6 +195,11 @@ function CalendarPage() {
   );
 }
 
+function RecipeWithRoute() {
+  const { file } = useParams();
+  return <APIRecipe file={file} />;
+}
+
 function App() {
   return (
     <Router>
@@ -203,6 +213,7 @@ function App() {
       <Route path="/sim" element={<MissileSimView></MissileSimView>} />
       <Route path="/chat/:id" element={<ChatMessagePage></ChatMessagePage>} />
       <Route path="/chats" element={<ChatListWithDetails agentID={4}></ChatListWithDetails>} ></Route>
+      <Route path="/remarkable" element={<Remarkable></Remarkable>} ></Route>
       <Route path="/data/:id/gantt" element={
         <GanttPage></GanttPage>
     } ></Route>
@@ -212,6 +223,11 @@ function App() {
     <Route path="/newChat" element={
         <APIChattableComponent></APIChattableComponent>
     } ></Route>
+
+    <Route path="/items/:file" element={<FlatItemsTableAPIView />} />
+  <Route path="/items/:file/:id" element={<FlatItemsTableAPIView />} />
+  <Route path="/tasks" element={<APIScheduleList file="schedule-1-1-26" />} />
+  <Route path="/recipe/:file" element={<RecipeWithRoute />} />
       
       </Routes>
       

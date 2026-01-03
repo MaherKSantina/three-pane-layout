@@ -19,14 +19,13 @@ import SendRounded from "@mui/icons-material/SendRounded";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import TableRowsIcon from "@mui/icons-material/TableRows";
 import MonacoViewer from "../MonacoViewer";
 import GenericDataTable from "../GenericDataTable";
 
 const RESIZE_IDLE_MS = 200; // fire after user stops dragging for this long
 const MAX_LINES = 20;
 
-export default function ChatWindow({ input, messages, sendMode = "text", onSendMessage, onChange, onRefresh, onMessageOptions, shouldFocus = true }) {
+export default function ChatWindow({ input, messages, sendMode = "text", onSendMessage, onChange, onRefresh, onMessageOptions }) {
   const inputRef = useRef(null);
   // useEffect(() => {
   //   if (sendMode === 'text' && inputRef.current && shouldFocus) {
@@ -50,7 +49,6 @@ export default function ChatWindow({ input, messages, sendMode = "text", onSendM
 
   // Message context menu
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const [menuMessage, setMenuMessage] = useState(null);
   const [menuIndex, setMenuIndex] = useState(null);
   const menuOpen = Boolean(menuAnchorEl);
 
@@ -156,9 +154,9 @@ export default function ChatWindow({ input, messages, sendMode = "text", onSendM
   };
 
   // Open editor for the input (editable)
-  const openInputEditor = () => {
+  const openInputEditor = (content) => {
     setViewerTitle("Compose");
-    setViewerContent(input);
+    setViewerContent(content);
     setViewerReadOnly(false);
     setOpenViewer(true);
   };
@@ -190,12 +188,10 @@ export default function ChatWindow({ input, messages, sendMode = "text", onSendM
 
   const handleMenuOpen = (evt, m, i) => {
     setMenuAnchorEl(evt.currentTarget);
-    setMenuMessage(m);
     setMenuIndex(i)
   };
   const handleMenuClose = () => {
     setMenuAnchorEl(null);
-    setMenuMessage(null);
     setMenuIndex(null)
   };
 
@@ -322,7 +318,7 @@ export default function ChatWindow({ input, messages, sendMode = "text", onSendM
                         WebkitLineClamp: MAX_LINES, // clamp to ~20 lines
                       }}
                     >
-                      {m.text}
+                      {m.text ?? m.data}
                     </div>
                   </Typography>
 
@@ -346,6 +342,18 @@ export default function ChatWindow({ input, messages, sendMode = "text", onSendM
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           transformOrigin={{ vertical: "top", horizontal: "right" }}
         >
+          <MenuItem
+            onClick={() => {
+              if (menuIndex != null) {
+                let m = messages[menuIndex];
+                openInputEditor(m.text ?? m.data);
+                handleMenuClose();
+              }
+              
+            }}
+          >
+            View
+          </MenuItem>
           <MenuItem
             onClick={() => {
               if (menuIndex != null) onMessageOptions?.("execute", menuIndex);
@@ -420,7 +428,7 @@ export default function ChatWindow({ input, messages, sendMode = "text", onSendM
                         aria-label="Open compose editor"
                         edge="end"
                         size="small"
-                        onClick={openInputEditor}
+                        onClick={() => openInputEditor(input)}
                       >
                         <OpenInFullIcon fontSize="small" />
                       </IconButton>

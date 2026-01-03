@@ -6,6 +6,7 @@ export default function APIChatWindow({sourceAgentID, channelID, isRequest = fal
 
   const [messages, setMessages] = useState([])
   const [layout, setLayout] = useState("text")
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
     reloadData()
@@ -22,12 +23,22 @@ export default function APIChatWindow({sourceAgentID, channelID, isRequest = fal
   }
 
   async function addMessage(msg) {
-    await axios.post(`https://api-digitalsymphony.ngrok.pizza/api/${messagesPath()}/${channelID}/createMessage`, {sourceAgentID, data: msg, isResponse: msg.isResponse})
+    let data = {
+      type: "text",
+      text: message
+    }
+    if(msg) {
+      data = msg
+    }
+    await axios.post(`https://api-digitalsymphony.ngrok.pizza/api/${messagesPath()}/${channelID}/createMessage`, {sourceAgentID, data, isResponse: true})
+    setMessage("")
     await reloadData()
     return true
   }
 
   return (
-    <ChatWindow messages={messages} sendMode={layout} onSendMessage={addMessage} onRefresh={reloadData}></ChatWindow>
+    <ChatWindow messages={messages} sendMode={layout} input={message} onChange={(m) => {
+      setMessage(m)
+    }} onSendMessage={addMessage} onRefresh={reloadData}></ChatWindow>
   )
 }
