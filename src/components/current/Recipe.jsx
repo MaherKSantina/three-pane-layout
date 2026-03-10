@@ -148,8 +148,7 @@ function SpecRow({ label, children, hideDivider }) {
   );
 }
 
-export default function RecipePage({ data }) {
-  const recipe = data?.recipe ?? {};
+export default function RecipePage({ data: recipe }) {
   const hero = recipe.hero_image ?? {};
   const author = recipe.author ?? {};
   const specs = recipe.specs ?? {};

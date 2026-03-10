@@ -25,6 +25,7 @@ import FlatItemsTableView from './components/current/FlatItemsTableView';
 import FlatItemsTableAPIView from './components/current/FlatItemsTableAPIView';
 import APIScheduleList from './components/current/APIScheduleList';
 import APIRecipe from './components/current/APIRecipe';
+import APIDynamicWorkflowForm from './components/current/APIDynamicWorkflowForm';
 
 const RESIZE_IDLE_MS = 150;
 
@@ -228,7 +229,7 @@ function App() {
   <Route path="/items/:file/:id" element={<FlatItemsTableAPIView />} />
   <Route path="/tasks" element={<APIScheduleList file="schedule-1-1-26" />} />
   <Route path="/recipe/:file" element={<RecipeWithRoute />} />
-      
+      <Route path="/newRecipe" element={<APIDynamicWorkflowForm />} />
       </Routes>
       
     </Router>
